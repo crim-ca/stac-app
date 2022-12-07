@@ -33,4 +33,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["uvicorn", "stac_app:app", "--root-path", "/stac", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uvicorn", "stac_app:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
