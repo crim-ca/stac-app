@@ -22,10 +22,19 @@ RUN pip install \
       -e stac_fastapi/extensions
 RUN pip install -e stac_fastapi/pgstac
 
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive \
+    apt-get install --no-install-recommends --assume-yes \
+      postgresql-client
+
 COPY . /app
 
 WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT uvicorn stac_app:app --root-path /stac --reload --host 0.0.0.0 --port 8000
+RUN chmod +x ./wait-for-postgres.sh
+
+ENV PG_DATABASE="test"
+
+ENTRYPOINT ["./wait-for-postgres.sh", "db", "uvicorn", "stac_app:app", "--root-path", "/stac", "--reload", "--host", "0.0.0.0", "--port", "8000"]
