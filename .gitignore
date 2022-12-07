@@ -8,10 +8,6 @@
 env.local
 env.docker
 
-# test config
-*.yml
-*.yaml
-
 # SSL certificates and related files
 **/*.cert
 **/*.crt
