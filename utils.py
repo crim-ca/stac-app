@@ -2,11 +2,11 @@
 """
 
 """
-__author__ = 'Richard Smith'
-__date__ = '13 Sep 2021'
-__copyright__ = 'Copyright 2018 United Kingdom Research and Innovation'
-__license__ = 'BSD - see LICENSE file in top-level package directory'
-__contact__ = 'richard.d.smith@stfc.ac.uk'
+__author__ = "Richard Smith"
+__date__ = "13 Sep 2021"
+__copyright__ = "Copyright 2018 United Kingdom Research and Innovation"
+__license__ = "BSD - see LICENSE file in top-level package directory"
+__contact__ = "richard.d.smith@stfc.ac.uk"
 
 # Taken from https://github.com/cedadev/stac-generator/blob/master/stac_generator/core/utils.py
 
@@ -26,7 +26,9 @@ def dict_merge(*args, add_keys=True) -> dict:
     for merge_dct in merge_dicts:
 
         if add_keys is False:
-            merge_dct = {key: merge_dct[key] for key in set(rtn_dct).intersection(set(merge_dct))}
+            merge_dct = {
+                key: merge_dct[key] for key in set(rtn_dct).intersection(set(merge_dct))
+            }
 
         for k, v in merge_dct.items():
 
@@ -36,10 +38,14 @@ def dict_merge(*args, add_keys=True) -> dict:
 
             # This is an existing key with mismatched types
             elif k in rtn_dct and type(v) != type(rtn_dct[k]):
-                raise TypeError(f"Overlapping keys exist with different types: original is {type(rtn_dct[k])}, new value is {type(v)}")
+                raise TypeError(
+                    f"Overlapping keys exist with different types: original is {type(rtn_dct[k])}, new value is {type(v)}"
+                )
 
             # Recursive merge the next level
-            elif isinstance(rtn_dct[k], dict) and isinstance(merge_dct[k], collections.abc.Mapping):
+            elif isinstance(rtn_dct[k], dict) and isinstance(
+                merge_dct[k], collections.abc.Mapping
+            ):
                 rtn_dct[k] = dict_merge(rtn_dct[k], merge_dct[k], add_keys=add_keys)
 
             # If the item is a list, append items avoiding duplictes

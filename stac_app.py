@@ -1,19 +1,14 @@
 """FastAPI application using PGStac."""
 # Based on stac-fastapi/stac_fastapi/pgstac/stac_fastapi/pgstac/app.py
 from fastapi.responses import ORJSONResponse
-
 from stac_fastapi.api.app import StacApi
-from stac_fastapi.api.models import create_get_request_model, create_post_request_model
-from stac_fastapi.extensions.core import (
-    FieldsExtension,
-    QueryExtension,
-    SortExtension,
-    TransactionExtension,
-    FilterExtension,
-    ContextExtension,
-    TokenPaginationExtension,
-    PaginationExtension
-)
+from stac_fastapi.api.models import (create_get_request_model,
+                                     create_post_request_model)
+from stac_fastapi.extensions.core import (ContextExtension, FieldsExtension,
+                                          FilterExtension, PaginationExtension,
+                                          QueryExtension, SortExtension,
+                                          TokenPaginationExtension,
+                                          TransactionExtension)
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
@@ -24,6 +19,7 @@ from starlette.middleware.cors import CORSMiddleware
 # TODO : Ok for now to use custom `FiltersClient, but will eventually need to use the official
 #  `stac_fastapi.pgstac.extensions.filter`
 from filters import FiltersClient
+
 # from stac_fastapi.pgstac.extensions.filter import FiltersClient
 
 settings = Settings()
@@ -40,7 +36,7 @@ extensions = [
     FilterExtension(client=FiltersClient()),
     ContextExtension(),
     TokenPaginationExtension(),
-    PaginationExtension()
+    PaginationExtension(),
 ]
 
 post_request_model = create_post_request_model(extensions, base_model=PgstacSearch)
@@ -53,7 +49,7 @@ api = StacApi(
     search_post_request_model=post_request_model,
     response_class=ORJSONResponse,
     title="Data Analytics for Canadian Climate Services STAC API",
-    description="Searchable spatiotemporal metadata describing climate and Earth observation datasets."
+    description="Searchable spatiotemporal metadata describing climate and Earth observation datasets.",
 )
 app = api.app
 
