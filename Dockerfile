@@ -33,8 +33,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-RUN chmod +x ./wait-for-postgres.sh
-
-ENV PG_DATABASE="test"
-
 ENTRYPOINT ["uvicorn", "stac_app:app", "--root-path", "/stac", "--reload", "--host", "0.0.0.0", "--port", "8000"]
