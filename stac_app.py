@@ -2,13 +2,17 @@
 # Based on stac-fastapi/stac_fastapi/pgstac/stac_fastapi/pgstac/app.py
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
-from stac_fastapi.api.models import (create_get_request_model,
-                                     create_post_request_model)
-from stac_fastapi.extensions.core import (ContextExtension, FieldsExtension,
-                                          FilterExtension, PaginationExtension,
-                                          QueryExtension, SortExtension,
-                                          TokenPaginationExtension,
-                                          TransactionExtension)
+from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.extensions.core import (
+    ContextExtension,
+    FieldsExtension,
+    FilterExtension,
+    PaginationExtension,
+    QueryExtension,
+    SortExtension,
+    TokenPaginationExtension,
+    TransactionExtension,
+)
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
