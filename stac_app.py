@@ -57,13 +57,13 @@ api = StacApi(
 )
 app = api.app
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
 @app.on_event("startup")
@@ -90,6 +90,8 @@ def run():
             log_level="debug",
             reload=settings.reload,
             proxy_headers=True,
+            root_path="sdfsdf",
+            headers=[("forwarded", "proto=https;host=test:1234")],
         )
     except ImportError:
         raise RuntimeError("Uvicorn must be installed in order to use command")
