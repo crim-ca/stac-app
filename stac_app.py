@@ -19,6 +19,8 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 from starlette.middleware.cors import CORSMiddleware
+import uvicorn
+import os
 
 # TODO : Ok for now to use custom `FiltersClient, but will eventually need to use the official
 #  `stac_fastapi.pgstac.extensions.filter`
@@ -81,14 +83,13 @@ async def shutdown_event():
 def run():
     """Run app from command line using uvicorn if available."""
     try:
-        import uvicorn
-
         uvicorn.run(
             "stac_app:app",
             host=settings.app_host,
             port=settings.app_port,
             log_level="debug",
             reload=settings.reload,
+            root_path=os.environ.get("ROOT_PATH"),
             proxy_headers=True,
         )
     except ImportError:
