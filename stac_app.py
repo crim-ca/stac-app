@@ -90,8 +90,6 @@ def run():
             log_level="debug",
             reload=settings.reload,
             proxy_headers=True,
-            root_path="sdfsdf",
-            headers=[("forwarded", "proto=https;host=test:1234")],
         )
     except ImportError:
         raise RuntimeError("Uvicorn must be installed in order to use command")
