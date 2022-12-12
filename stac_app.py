@@ -57,7 +57,7 @@ api = StacApi(
     response_class=ORJSONResponse,
     title="Data Analytics for Canadian Climate Services STAC API",
     description="Searchable spatiotemporal metadata describing climate and Earth observation datasets.",
-    router=APIRouter(prefix=os.environ.get("ROOT_PATH")),
+    router=APIRouter(prefix=os.environ.get("ROUTER_PREFIX")),
 )
 app = api.app
 
