@@ -1,5 +1,6 @@
 """FastAPI application using PGStac."""
 # Based on stac-fastapi/stac_fastapi/pgstac/stac_fastapi/pgstac/app.py
+from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import create_get_request_model, create_post_request_model
@@ -56,6 +57,7 @@ api = StacApi(
     response_class=ORJSONResponse,
     title="Data Analytics for Canadian Climate Services STAC API",
     description="Searchable spatiotemporal metadata describing climate and Earth observation datasets.",
+    router=APIRouter(prefix=os.environ.get("ROOT_PATH")),
 )
 app = api.app
 
@@ -81,7 +83,6 @@ def run():
             port=settings.app_port,
             log_level="debug",
             reload=settings.reload,
-            root_path=os.environ.get("ROOT_PATH"),
             proxy_headers=True,
         )
     except ImportError:
