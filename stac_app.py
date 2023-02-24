@@ -22,7 +22,7 @@ from stac_fastapi.pgstac.types.search import PgstacSearch
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 import os
-import sys
+import time
 
 # TODO : Ok for now to use custom `FiltersClient, but will eventually need to use the official
 #  `stac_fastapi.pgstac.extensions.filter`
@@ -66,10 +66,14 @@ app = api.app
 @app.on_event("startup")
 async def startup_event():
     """Connect to database on startup."""
-    try:
-        await connect_to_db(app)
-    except:
-        sys.exit(1)
+    for i in range(0, 100):
+        while True:
+            try:
+                await connect_to_db(app)
+            except:
+                print("ERROR: Connection to DB failed. Retrying in 3s. ({0})")
+                time.sleep(3)
+                continue
 
 
 @app.on_event("shutdown")
