@@ -66,7 +66,9 @@ app = api.app
 @app.on_event("startup")
 async def startup_event():
     """Connect to database on startup."""
-    retries = 50
+    retries = 60
+
+    # TODO : log errors to stdout
 
     while retries > 0:
         try:
