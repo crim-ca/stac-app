@@ -66,14 +66,19 @@ app = api.app
 @app.on_event("startup")
 async def startup_event():
     """Connect to database on startup."""
-    for i in range(0, 100):
-        while True:
-            try:
-                await connect_to_db(app)
-            except:
-                print("ERROR: Connection to DB failed. Retrying in 3s. ({0})")
-                time.sleep(3)
-                continue
+    retries = 50
+
+    while retries > 0:
+        try:
+            await connect_to_db(app)
+            break
+        except:
+            print("ERROR: Connection to DB failed. Retrying in 3s. ({retries})")
+            time.sleep(3)
+            retries -= 1
+
+    if retries == 0:
+        print("ERROR: Connection to DB failed after {retries} retries.")
 
 
 @app.on_event("shutdown")
