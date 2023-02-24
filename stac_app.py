@@ -22,6 +22,7 @@ from stac_fastapi.pgstac.types.search import PgstacSearch
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 import os
+import sys
 
 # TODO : Ok for now to use custom `FiltersClient, but will eventually need to use the official
 #  `stac_fastapi.pgstac.extensions.filter`
@@ -65,7 +66,10 @@ app = api.app
 @app.on_event("startup")
 async def startup_event():
     """Connect to database on startup."""
-    await connect_to_db(app)
+    try:
+        await connect_to_db(app)
+    except:
+        sys.exit(1)
 
 
 @app.on_event("shutdown")
