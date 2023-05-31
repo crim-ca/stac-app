@@ -16,11 +16,14 @@ RUN git clone https://github.com/stac-utils/stac-fastapi.git
 
 WORKDIR /stac-fastapi
 
+# TODO : checkout to working November 25 2022 version of stac-fastapi, where pgstac was bundled in stac-fastapi (now `pip install pypgstac`)
+RUN git checkout d53e792
+
 RUN pip install \
       -e stac_fastapi/api \
       -e stac_fastapi/types \
       -e stac_fastapi/extensions
-RUN pip install pypgstac
+RUN pip install -e stac_fastapi/pgstac
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
