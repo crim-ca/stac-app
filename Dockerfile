@@ -20,7 +20,7 @@ RUN pip install \
       -e stac_fastapi/api \
       -e stac_fastapi/types \
       -e stac_fastapi/extensions
-RUN pip install -e stac_fastapi/pgstac
+RUN pip pypgstac
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive \
