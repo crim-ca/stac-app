@@ -26,6 +26,7 @@ class PgstacSearchFieldsExtension(PgstacSearch):
 
     conf: Optional[Dict] = {}
     fields: PostFieldsExtension = PostFieldsExtension()
+    limit: Optional[int] = 10000
 
 
 @attr.s
@@ -41,7 +42,7 @@ class FiltersClient(AsyncBaseFiltersClient):
     async def collection_summaries(self, collection_id: str, **kwargs) -> Dict:
         properties = {}
         core_crud_client = CoreCrudClient(
-            post_request_model=PgstacSearchFieldsExtension(limit=1000)
+            post_request_model=PgstacSearchFieldsExtension
         )
         item_collection = await core_crud_client.item_collection(
             collection_id, **kwargs
