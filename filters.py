@@ -41,7 +41,7 @@ class FiltersClient(AsyncBaseFiltersClient):
     async def collection_summaries(self, collection_id: str, **kwargs) -> Dict:
         properties = {}
         core_crud_client = CoreCrudClient(
-            post_request_model=PgstacSearchFieldsExtension
+            post_request_model=PgstacSearchFieldsExtension(limit=1000)
         )
         item_collection = await core_crud_client.item_collection(
             collection_id, **kwargs
