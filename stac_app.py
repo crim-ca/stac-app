@@ -31,8 +31,8 @@ from filters import FiltersClient
 # from stac_fastapi.pgstac.extensions.filter import FiltersClient
 
 settings = Settings()
-settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
-settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
+# settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
+# settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
 extensions = [
     TransactionExtension(
