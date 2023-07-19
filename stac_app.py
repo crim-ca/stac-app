@@ -76,8 +76,9 @@ async def startup_event():
         try:
             await connect_to_db(app)
             break
-        except:
+        except Exception as e:
             print("ERROR: Connection to DB failed. Retrying in 3s. ({retries})")
+            print(e)
             time.sleep(3)
             retries -= 1
 
