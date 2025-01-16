@@ -20,3 +20,6 @@ env.docker
 
 # Python
 __pycache__/
+
+# virtual environments
+venv/
