@@ -2,7 +2,8 @@
 .idea/
 .vscode/
 
-## Project
+## linters/formatters
+.ruff_cache/
 
 # credentials file
 env.local

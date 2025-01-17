@@ -2,7 +2,10 @@
 
 # Based on stac-fastapi/stac_fastapi/pgstac/stac_fastapi/pgstac/app.py
 import logging
+import os
+import time
 from typing import Optional
+
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
@@ -21,12 +24,9 @@ from stac_fastapi.extensions.core import (
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
+from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
-import os
-import time
-
-from stac_fastapi.pgstac.extensions.filter import FiltersClient
 
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
@@ -53,6 +53,8 @@ post_request_model = create_post_request_model(extensions, base_model=PgstacSear
 router_prefix = os.environ.get("ROUTER_PREFIX")
 router_prefix_str = router_prefix.rstrip("/") if router_prefix else ""
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 api = StacApi(
     settings=settings,
     extensions=extensions,
@@ -71,14 +73,14 @@ app = api.app
 
 
 async def _execute_query(command: str, conn: asyncpg.Connection) -> None:
-    """Execute a postgres command"""
+    """Execute a postgres command."""
     query, params = render(command)
     await conn.fetchval(query, *params)
 
 
 async def _load_queryables_functions(conn: asyncpg.Connection) -> None:
-    """Load queryables functions into the database"""
-    with open("discover_queryables.sql") as f:
+    """Load queryables functions into the database."""
+    with open(os.path.join(THIS_DIR, "scripts", "discover_queryables.sql")) as f:
         sql_content = f.read().split("-- SPLITHERE --")
     try:
         for content in sql_content:
@@ -90,8 +92,8 @@ async def _load_queryables_functions(conn: asyncpg.Connection) -> None:
 
 
 async def _load_summaries_functions(conn: asyncpg.Connection) -> None:
-    """Load summaries functions into the database"""
-    with open("discover_summaries.sql") as f:
+    """Load summaries functions into the database."""
+    with open(os.path.join(THIS_DIR, "scripts", "discover_summaries.sql")) as f:
         sql_content = f.read().split("-- SPLITHERE --")
     try:
         for content in sql_content:
@@ -139,6 +141,7 @@ if os.getenv("STAC_DEFAULT_QUERYABLES") != "1":
 
     @app.patch(f"{router_prefix_str}/queryables")
     async def update_queryables(request: Request) -> Response:
+        """Update the queryables table based on the data present in the database."""
         try:
             async with request.app.state.writepool.acquire() as conn:
                 await _execute_query("SELECT update_queryables();", conn)
@@ -151,6 +154,7 @@ if os.getenv("STAC_DEFAULT_SUMMARIES") != "1":
 
     @app.patch(f"{router_prefix_str}/summaries")
     async def update_summaries(request: Request) -> Response:
+        """Update the collection summaries based on the data present in the database."""
         try:
             async with request.app.state.writepool.acquire() as conn:
                 await _execute_query("SELECT update_summaries_and_extents();", conn)

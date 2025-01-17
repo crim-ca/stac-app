@@ -79,9 +79,24 @@ To set a custom path for the OpenAPI routes set the following environment variab
     - returns a description of this API in HTML format
 
 
-## CONTRIBUTING
+## Contributing
+
+Ensure that the pre-commit checks are installed so that you make sure that your code changes conform to
+the expected style for this project.
 
 ```
 pip install pre-commit
 pre-commit install
 ```
+
+## Releasing
+
+Before making a new release:
+
+```
+pip install bump2version
+bump2version <part>
+```
+
+Where `<part>` is one of `major`, `minor`, `patch` to determine which version number is updated.
+This project uses [semantic versioning](https://semver.org/).

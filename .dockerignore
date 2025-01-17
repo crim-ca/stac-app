@@ -1,5 +1,4 @@
 *
-!stac_app.py
 !requirements.txt
-!discover_queryables.sql
-!discover_summaries.sql
+!src/
+src/**/__pycache__
