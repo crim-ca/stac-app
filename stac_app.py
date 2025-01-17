@@ -123,9 +123,9 @@ async def startup_event() -> None:
         logger.error("Unable to connect to database after %s retries", max_retries)
         return
     async with app.state.writepool.acquire() as conn:
-        if os.getenv("STAC_DEFAULT_QUERYABLES") is None:
+        if os.getenv("STAC_DEFAULT_QUERYABLES") != "1":
             await _load_queryables_functions(conn)
-        if os.getenv("STAC_DEFAULT_SUMMARIES") is None:
+        if os.getenv("STAC_DEFAULT_SUMMARIES") != "1":
             await _load_summaries_functions(conn)
 
 
@@ -135,7 +135,7 @@ async def shutdown_event() -> None:
     await close_db_connection(app)
 
 
-if os.getenv("STAC_DEFAULT_QUERYABLES") is None:
+if os.getenv("STAC_DEFAULT_QUERYABLES") != "1":
 
     @app.patch(f"{router_prefix_str}/queryables")
     async def update_queryables(request: Request) -> Response:
@@ -147,7 +147,7 @@ if os.getenv("STAC_DEFAULT_QUERYABLES") is None:
         return {"detail": "Updated queryables"}
 
 
-if os.getenv("STAC_DEFAULT_SUMMARIES") is None:
+if os.getenv("STAC_DEFAULT_SUMMARIES") != "1":
 
     @app.patch(f"{router_prefix_str}/summaries")
     async def update_summaries(request: Request) -> Response:

@@ -23,7 +23,11 @@ in the database.
 We recommend that you update the queryables after you add/remove/update any items in the database.
 
 Custom queryables are enabled by default. To disable this feature and only use the 
-queryables provided by [stac-fastapi-pgstac](https://github.com/stac-utils/stac-fastapi-pgstac), set the `STAC_DEFAULT_QUERYABLES` environment variable.
+queryables provided by [stac-fastapi-pgstac](https://github.com/stac-utils/stac-fastapi-pgstac), set the `STAC_DEFAULT_QUERYABLES` environment variable to `1`.
+
+```sh
+export STAC_DEFAULT_QUERYABLES=1
+```
 
 #### Custom Collection Summaries
 
@@ -38,7 +42,12 @@ in the database.
 > [!Note]
 > These functions will only update the first extent value which defines the extent of the whole collection, additional extents that describe subsets of the collection will not be modified.
 
-Custom summaries are enabled by default. To disable this feature and only use the set the `STAC_DEFAULT_SUMMARIES` environment variable.
+Custom summaries are enabled by default. To disable this feature and set the `STAC_DEFAULT_SUMMARIES` environment variable 
+to `1`:
+
+```sh
+export STAC_DEFAULT_SUMMARIES=1
+```
 
 #### Settable Router Prefix
 
