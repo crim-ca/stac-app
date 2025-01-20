@@ -78,6 +78,9 @@ To set a custom path for the OpenAPI routes set the following environment variab
     - default: `/api.html`
     - returns a description of this API in HTML format
 
+> [!NOTE]
+> Note that other environment variables can be used to set other settings according to the [FastAPI documentation](https://fastapi.tiangolo.com/advanced/settings/#settings-and-environment-variables) and the
+[STAC-FastAPI documentation](https://stac-utils.github.io/stac-fastapi/tips-and-tricks/#set-api-title-description-and-version)
 
 ## Contributing
 

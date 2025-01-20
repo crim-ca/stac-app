@@ -29,5 +29,6 @@ Prior Versions
 ------------------------------------------------------------------------------------------------------------------
 
 All versions prior to [1.0.0](https://github.com/crim-ca/stac-app/1.0.0) were not officially tagged.
-Is it strongly recommended employing later versions to ensure better traceability of changes that could impact behavior
-and potential issues. 
+Is it strongly recommended to use a tagged version to ensure better traceability of changes that could impact behavior
+and potential issues.
+The docker image for the version directly prior to 1.0.0 is tagged as [version 0.0.0](https://github.com/crim-ca/stac-app/pkgs/container/stac-app/113480762?tag=0.0.0).
