@@ -19,6 +19,14 @@
 
 - Update README.md to document the new functionality described above.
 
+- Add `PATCH /queryables` endpoint to update queryables to reflect the current items stored in the database.
+  This endpoint takes the optional parameter `minimal`. If the minimal parameter is True, then only "minimal" 
+  queryables will set. Minimal queryables are those whose values are scalar JSON types. Collection JSON types 
+  (objects and arrays) will be omitted.
+
+- Add `PATCH /summaries` endpoint to update collection summaries to reflect the current items associated with
+  all collections.
+
 - Moved source code to the `src/` folder to improve code organization.
 
 - Introduced `ruff` as a linter and formatter used by `pre-commit`.
