@@ -1,3 +1,6 @@
+-- This file contains functions to extract collection summaries based on the items in the given collection.
+-- This file uses functions that are defined in the json_schema_builder.sql file (ensure those functions are also loaded).
+
 -- Get minimum and maximum values for all axes for the bbox of a given collection.
 CREATE OR REPLACE FUNCTION discover_bbox_extent(_collection text) RETURNS TABLE(definition jsonb) as $$
 DECLARE
@@ -37,7 +40,6 @@ BEGIN
 END
 $$ LANGUAGE PLPGSQL;
 
-
 -- NOTE: the SPLITHERE comments are used to divide this script into sections with one SQL command per section
 --       this allows this script to be executed one command at a time when the app starts.
 -- SPLITHERE --
@@ -51,24 +53,20 @@ BEGIN
     SELECT format('_items_%s', key) INTO _partition FROM collections WHERE id=_collection;
     q := format(
         $q$
-            WITH t AS (
-                SELECT content->'properties' AS properties
-                FROM %I
-            ), p AS (
-                SELECT key, value
-                FROM t
-                JOIN LATERAL jsonb_each(properties) ON TRUE
-                WHERE key IN ('datetime', 'end_datetime', 'start_datetime')
-            ), j as (
-                SELECT
-                    -- note: RFC 3339 date strings will sort lexicographically
-                    min(value::text) as minvalue,
-                    max(value::text) as maxvalue
-                FROM p
+            WITH a AS (
+                SELECT jsonb_path_query(
+                            (SELECT jsonb_object_agg(key, value) 
+                             FROM jsonb_each(content->'properties') 
+                             WHERE key = ANY ('{datetime,end_datetime,start_datetime}')),
+                            '$.*'
+                        ) AS dates from %I
+            ), b AS (
+                SELECT jsonb_schema_agg(dates)->'description' AS description FROM a
             )
             SELECT
-                jsonb_build_array(minvalue::jsonb, maxvalue::jsonb)
-            FROM j;
+                jsonb_build_array(substring(description::text, 'minimum=\\"(\S+)\\"'), 
+                                  substring(description::text, 'maximum=\\"(\S+)\\"'))
+            FROM b;
         $q$,
         _partition
     );
@@ -105,8 +103,8 @@ $$ LANGUAGE SQL;
 
 -- SPLITHERE --
 
--- Get enum values for most properties for a given collection (not including date values).
-CREATE OR REPLACE FUNCTION discover_enum_summaries(_collection text) RETURNS TABLE(definition jsonb) as $$
+-- Get summaries of the properties in each item in the collection
+CREATE OR REPLACE FUNCTION discover_summaries(_collection text) RETURNS TABLE(property text, summary jsonb) AS $$
 DECLARE
     q text;
     _partition text;
@@ -114,82 +112,41 @@ BEGIN
     SELECT format('_items_%s', key) INTO _partition FROM collections WHERE id=_collection;
     q := format(
         $q$
-            WITH t AS (
-                SELECT content->'properties' AS properties
-                FROM %I
-            ), p AS (
-                SELECT DISTINCT ON (key, a.value)
-                    key, 
-                    a.value
-                FROM t
-                JOIN LATERAL jsonb_each(properties) ON TRUE
-                JOIN LATERAL jsonb_array_elements(
-                    CASE jsonb_typeof(value)
-                        WHEN 'array' THEN
-                            value
-                        ELSE
-                            jsonb_build_array(value)
-                    END
-                ) AS a ON TRUE
-                -- see https://github.com/stac-extensions/timestamps
-                WHERE key NOT IN ('created', 'updated', 'published', 'expires', 'unpublished', 'datetime', 'start_datetime', 'end_datetime')
-            ), j as (
+            WITH a AS (
+                SELECT 
+                    jsonb_schema_agg(content->'properties')->'properties' as properties
+                FROM 
+                    %I 
+            ), b AS (
                 SELECT
-                    jsonb_agg(value) as values,
-                    key
-                FROM p
-                GROUP BY key
+                    key,
+                    value,
+                    jsonb_path_query(value, '$.enum') AS enum,
+                    jsonb_path_query(value, '$.description') as description,
+                    jsonb_path_query(value, '$.minimum') as minimum,
+                    jsonb_path_query(value, '$.maximum') as maximum
+                FROM jsonb_each((SELECT * FROM a))
             )
-            SELECT
-                jsonb_object_agg(key, values)
-            FROM j;
+            SELECT key, (
+                CASE 
+                    WHEN enum IS NOT NULL THEN
+                        enum
+                    WHEN description IS NOT NULL THEN
+                        jsonb_build_object('minimum', substring(description::text, 'minimum=\\"(\S+)\\"'), 
+                                           'maximum', substring(description::text, 'maximum=\\"(\S+)\\"'))
+                    WHEN minimum IS NOT NULL and maximum IS NOT NULL THEN
+                        jsonb_build_object('minimum', minimum, 
+                                           'maximum', maximum)
+                    ELSE
+                        value
+                END
+            ) FROM b;
         $q$,
-        _partition
+        _partition,
+        _collection
     );
     RETURN QUERY EXECUTE q;
-END
-$$ LANGUAGE PLPGSQL;
-
--- SPLITHERE --
-
--- Get minimum and maximum values for the date properties.
--- Note: This does not include the following properties 'datetime', 'end_datetime', 'start_datetime'
---       since those are used to determine the temporal extent (see above).
-CREATE OR REPLACE FUNCTION discover_range_summaries(_collection text) RETURNS TABLE(definition jsonb) as $$
-DECLARE
-    q text;
-    _partition text;
-BEGIN
-    SELECT format('_items_%s', key) INTO _partition FROM collections WHERE id=_collection;
-    q := format(
-        $q$
-            WITH t AS (
-                SELECT content->'properties' AS properties
-                FROM %I
-            ), p AS (
-                SELECT key, value
-                FROM t
-                JOIN LATERAL jsonb_each(properties) ON TRUE
-                -- see https://github.com/stac-extensions/timestamps
-                WHERE key IN ('created', 'updated', 'published', 'expires', 'unpublished')
-            ), j as (
-                SELECT
-                    -- note: RFC 3339 date strings will sort lexicographically
-                    min(value::text) as minvalue,
-                    max(value::text) as maxvalue,
-                    key
-                FROM p
-                GROUP BY key
-            )
-            SELECT
-                jsonb_object_agg(key, jsonb_build_object('minimum', minvalue::jsonb, 'maximum', maxvalue::jsonb))
-            FROM j;
-        $q$,
-        _partition
-    );
-    RETURN QUERY EXECUTE q;
-END
-$$ LANGUAGE PLPGSQL;
+END; $$ LANGUAGE PLPGSQL;
 
 -- SPLITHERE --
 
@@ -197,11 +154,7 @@ $$ LANGUAGE PLPGSQL;
 CREATE OR REPLACE FUNCTION update_summaries(_collection text) RETURNS void as $$
     UPDATE collections
     SET content = jsonb_set(content, '{summaries}', (
-        SELECT jsonb_object_agg(key, value) FROM (
-            SELECT key, value FROM jsonb_each((SELECT definition FROM discover_enum_summaries(_collection)))
-            UNION ALL
-            SELECT key, value FROM jsonb_each((SELECT definition FROM discover_range_summaries(_collection)))
-        ) AS t
+        SELECT jsonb_object_agg(property, summary) FROM discover_summaries(_collection)
     ), TRUE)
     WHERE id = _collection;
 $$ LANGUAGE SQL;

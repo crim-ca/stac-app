@@ -78,30 +78,18 @@ async def _execute_query(command: str, conn: asyncpg.Connection) -> None:
     await conn.fetchval(query, *params)
 
 
-async def _load_queryables_functions(conn: asyncpg.Connection) -> None:
-    """Load queryables functions into the database."""
-    with open(os.path.join(THIS_DIR, "scripts", "discover_queryables.sql")) as f:
+async def _load_script(script_basename: str, conn: asyncpg.Connection) -> None:
+    """Load script into the database."""
+    script_name = os.path.splitext(script_basename)[0]
+    with open(os.path.join(THIS_DIR, "scripts", script_basename)) as f:
         sql_content = f.read().split("-- SPLITHERE --")
     try:
         for content in sql_content:
             await _execute_query(content, conn)
     except Exception:
-        logger.error("Failed to update discover_queryables functions", exc_info=True)
+        logger.error("Failed to update %s functions", script_name, exc_info=True)
     else:
-        logger.info("Updated discover_queryables functions")
-
-
-async def _load_summaries_functions(conn: asyncpg.Connection) -> None:
-    """Load summaries functions into the database."""
-    with open(os.path.join(THIS_DIR, "scripts", "discover_summaries.sql")) as f:
-        sql_content = f.read().split("-- SPLITHERE --")
-    try:
-        for content in sql_content:
-            await _execute_query(content, conn)
-    except Exception:
-        logger.error("Failed to update discover_summaries functions", exc_info=True)
-    else:
-        logger.info("Updated discover_summaries functions")
+        logger.info("Updated %s functions", script_name)
 
 
 @app.on_event("startup")
@@ -125,10 +113,11 @@ async def startup_event() -> None:
         logger.error("Unable to connect to database after %s retries", max_retries)
         return
     async with app.state.writepool.acquire() as conn:
+        await _load_script("json_schema_builder.sql", conn)
         if os.getenv("STAC_DEFAULT_QUERYABLES") != "1":
-            await _load_queryables_functions(conn)
+            await _load_script("discover_queryables.sql", conn)
         if os.getenv("STAC_DEFAULT_SUMMARIES") != "1":
-            await _load_summaries_functions(conn)
+            await _load_script("discover_summaries.sql", conn)
 
 
 @app.on_event("shutdown")
@@ -140,14 +129,20 @@ async def shutdown_event() -> None:
 if os.getenv("STAC_DEFAULT_QUERYABLES") != "1":
 
     @app.patch(f"{router_prefix_str}/queryables")
-    async def update_queryables(request: Request) -> Response:
-        """Update the queryables table based on the data present in the database."""
+    async def update_queryables(request: Request, minimal: bool = False) -> Response:
+        """
+        Update the queryables table based on the data present in the database.
+
+        If the minimal parameter is True, then only "minimal" queryables will set.
+        Minimal queryables are those whose values are scalar JSON types. Collection
+        JSON types (objects and arrays) will be omitted.
+        """
         try:
             async with request.app.state.writepool.acquire() as conn:
-                await _execute_query("SELECT update_queryables();", conn)
+                await _execute_query(f"SELECT update_queryables({'TRUE' if minimal else ''});", conn)
         except Exception as err:
             raise HTTPException(status_code=500, detail=f"Unable to update queryables: {err}")
-        return {"detail": "Updated queryables"}
+        return {"detail": f"Updated {'minimal ' if minimal else ''}queryables"}
 
 
 if os.getenv("STAC_DEFAULT_SUMMARIES") != "1":
