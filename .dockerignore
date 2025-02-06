@@ -1,2 +1,4 @@
-env.local
-env.docker
+*
+!requirements.txt
+!src/
+src/**/__pycache__
