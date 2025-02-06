@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
+[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+
+[1.0.0](https://github.com/crim-ca/stac-app/tree/1.0.0)
+------------------------------------------------------------------------------------------------------------------
+
 # Changed
 
 - Make queryables and summaries automatically updatable
