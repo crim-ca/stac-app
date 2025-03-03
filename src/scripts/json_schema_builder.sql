@@ -72,9 +72,10 @@ DECLARE
     best_match jsonb;
     best_match_index text;
 BEGIN
+    RAISE NOTICE '%s | %s', $1, $2;
     CASE 
         WHEN $1 IS NULL THEN
-            RETURN $2;
+            RETURN jsonb_build_array($2);
         ELSE
             SELECT jsonb_object_agg(ord, new) FROM (
                 SELECT length(new::text) - length(value::text) AS diff, new, ord
@@ -163,16 +164,27 @@ BEGIN
                         WHEN $1->'items' ? 'anyOf' THEN
                             result = jsonb_build_object(
                                 'items', jsonb_build_object('__is_summary', TRUE,
-                                                            'anyOf', (SELECT _condense_anyOf_agg(elem) 
+                                                            'anyOf', (SELECT _condense_anyOf_agg(elem)
                                                                       FROM jsonb_array_elements(
                                                                                 jsonb_path_query_array(
-                                                                                    jsonb_build_array($1->'items'->'anyOf', $2), 
-                                                                                    '$[*][*]'))),
+                                                                                    jsonb_build_array(
+                                                                                        jsonb_build_array($1->'items'->'anyOf'), 
+                                                                                        $2
+                                                                                    ), '$[*][*]')) AS elem),
                                 'type', 'array',
                                 '__is_summary', TRUE
                             ));
                         WHEN $1->'items' = jsonb_build_array() THEN
                             result = _jsonb_schema($2);
+                        WHEN $1->'items' @> '{"format": "date-time"}' THEN
+                            result = jsonb_build_object('items', (SELECT _jsonb_schema_agg(elem) FROM jsonb_array_elements(
+                                                                            jsonb_path_query_array(
+                                                                                jsonb_build_array(
+                                                                                    jsonb_build_array($1->'items'),
+                                                                                    $2)
+                                                                            , '$[*][*]')) AS elem),
+                                                        'type', 'array',
+                                                        '__is_summary', TRUE);
                         ELSE
                             result = _jsonb_schema(
                                         jsonb_path_query_array(

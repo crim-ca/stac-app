@@ -3,7 +3,13 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
-[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+# Fixed
+
+- Fix bug where arrays of datetime values were not handled correctly
+
+  Arrays of datetime strings were not being considered as values that can have a minimum and
+  maximum (ie. a range) so were summarized as deeply nested `anyOf` schemas. This is a very 
+  inefficient way to store a schema representing these values.
 
 [1.0.0](https://github.com/crim-ca/stac-app/tree/1.0.0)
 ------------------------------------------------------------------------------------------------------------------
