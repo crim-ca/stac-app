@@ -72,7 +72,6 @@ DECLARE
     best_match jsonb;
     best_match_index text;
 BEGIN
-    RAISE NOTICE '%s | %s', $1, $2;
     CASE 
         WHEN $1 IS NULL THEN
             RETURN jsonb_build_array($2);
