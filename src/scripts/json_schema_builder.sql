@@ -62,11 +62,14 @@ END; $$ LANGUAGE PLPGSQL;
 -- Note: the first argument must be an array that contains json schemas, the second argument must be a
 --       jsonb element.
 -- For example:
---    schema = '[{"type": "string", "enum": ["a", "b"]}, {"type": "number", "minimum": 3, "maximum": 5}]'
---    _condense_anyOf(schema, '"c"') = '[{"type": "string", "enum": ["a", "b", "c"]}, {"type": "number", "minimum": 3, "maximum": 5}]'
---    _condense_anyOf(schema, '"a"') = schema
---    _condense_anyOf(schema, '10') -> '[{"type": "string", "enum": ["a", "b"]}, {"type": "number", "minimum": 3, "maximum": 10}]'
---    _condense_anyOf(schema, '{}') -> '[{"type": "string", "enum": ["a", "b"]}, {"type": "number", "minimum": 3, "maximum": 5}, {"type": "object", "properties": {}}]'
+--    schema = '[{"type": "string", "enum": ["a", "b"], "__is_summary": true}, {"type": "number", "minimum": 3, "maximum": 5, "__is_summary": true}]'
+--    _condense_anyOf(schema, '"c"') -> '[{"type": "string", "enum": ["a", "b", "c"], "__is_summary": true}, {"type": "number", "minimum": 3, "maximum": 5, "__is_summary": true}]'
+--    _condense_anyOf(schema, '"a"') -> schema
+--    _condense_anyOf(schema, '10') -> '[{"type": "string", "enum": ["a", "b"], "__is_summary": true}, {"type": "number", "minimum": 3, "maximum": 10, "__is_summary": true}]'
+--    _condense_anyOf(schema, '{}') -> '[{"type": "string", "enum": ["a", "b"], "__is_summary": true}, {"type": "number", "minimum": 3, "maximum": 5, "__is_summary": true}, {"type": "object", "properties": {}, "__is_summary": true}]'
+-- This also supports condensing datetime objects:
+--    schema = [{"type": "array", "items": {"type": "string", "format": "date-time", "maximum": 1379116800, "minimum": -3824453700, "pattern": "(\\+00:00|Z)$", "description": "Datetime. minimum=\"1848-10-22T11:45:00Z\" maximum=\"2013-09-14T00:00:00Z\"", "__is_summary": true}]
+--    _condense_anyOf(schema, '["1979-01-09T00:00:00Z", "2002-01-10T00:00:00Z"]') -> schema
 CREATE OR REPLACE FUNCTION _condense_anyOf(jsonb, jsonb) RETURNS jsonb AS $$
 DECLARE
     best_match jsonb;
