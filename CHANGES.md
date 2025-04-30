@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
+[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+
+[1.0.1](https://github.com/crim-ca/stac-app/tree/1.0.1)
+------------------------------------------------------------------------------------------------------------------
+
 # Fixed
 
 - Fix bug where arrays of datetime values were not handled correctly
