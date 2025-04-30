@@ -3,7 +3,10 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
-[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+# Fixed
+
+- Fix `next` paging link in `/collections/{collectionID}/items` that was not correctly resolving the `token` parameter,
+  leading to an endless loop over the first paging items.
 
 [1.0.1](https://github.com/crim-ca/stac-app/tree/1.0.1)
 ------------------------------------------------------------------------------------------------------------------
