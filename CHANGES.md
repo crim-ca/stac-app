@@ -12,7 +12,8 @@
 # Fixed
 
 - Fix `rel=next` paging link in `/collections/{collectionID}/items` that was not correctly resolving the `token`
-  parameter, leading to an endless loop over the first paging items.
+  parameter, leading to an endless loop over the first paging items
+  (fixes [#26](https://github.com/crim-ca/stac-app/issues/26)).
 
 [1.0.1](https://github.com/crim-ca/stac-app/tree/1.0.1)
 ------------------------------------------------------------------------------------------------------------------
