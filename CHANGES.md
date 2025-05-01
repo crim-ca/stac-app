@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
+[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+
+[1.1.0](https://github.com/crim-ca/stac-app/tree/1.1.0)
+------------------------------------------------------------------------------------------------------------------
+
 # Changed
 
 - Update to latest available versions `stac-fastapi.api==5.2.0`, `stac-fastapi.pgstac==5.0.2` and `uvicorn==0.34.2`.
