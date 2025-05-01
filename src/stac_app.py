@@ -6,27 +6,38 @@ import os
 import time
 from typing import Optional, Type, cast
 
+import attr
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
+    EmptyRequest,
     ItemCollectionUri,
     create_request_model,
     create_get_request_model,
     create_post_request_model
 )
+from stac_fastapi.types.stac import ItemCollection
 from stac_fastapi.types.search import APIRequest
 from stac_fastapi.extensions.core import (
+    CollectionSearchExtension,
+    CollectionSearchFilterExtension,
+    CollectionSearchPostExtension,
+    FreeTextAdvancedExtension,
     FieldsExtension,
     FilterExtension,
+    ItemCollectionFilterExtension,
     PaginationExtension,
     QueryExtension,
     SortExtension,
     TokenPaginationExtension,
     TransactionExtension,
 )
+from stac_fastapi.extensions.core.collection_search.client import BaseCollectionSearchClient
+from stac_fastapi.extensions.core.collection_search.request import BaseCollectionSearchPostRequest
+from stac_fastapi.extensions.core.free_text.request import FreeTextAdvancedExtensionPostRequest
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
@@ -49,6 +60,25 @@ items_get_request_model = cast(
         mixins=[TokenPaginationExtension().GET],
     )
 )
+collections_get_request_model = cast(
+    Type[APIRequest],
+    create_request_model(
+        "CollectionsURI",
+        base_model=EmptyRequest,
+        mixins=[TokenPaginationExtension().GET, PaginationExtension().GET],
+    )
+)
+
+# class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvancedExtensionPostRequest):
+#     pass
+
+
+# @attr.s
+# class CollectionSearchPostClient(BaseCollectionSearchClient):
+#     def post_all_collections(
+#         self, search_request: CollectionSearchPostRequest, **kwargs
+#     ) -> ItemCollection:
+#         return search_request.model_dump()
 
 extensions = [
     TransactionExtension(
@@ -60,6 +90,11 @@ extensions = [
     SortExtension(),
     FieldsExtension(),
     FilterExtension(client=FiltersClient()),
+    #FreeTextAdvancedExtension(),
+    #CollectionSearchExtension(),
+    #CollectionSearchPostExtension(client=CollectionSearchPostClient(), settings=settings),
+    #CollectionSearchFilterExtension(),
+    #ItemCollectionFilterExtension(),
     TokenPaginationExtension(),
     PaginationExtension(),
 ]
@@ -76,6 +111,7 @@ api = StacApi(
     client=CoreCrudClient(pgstac_search_model=post_request_model),
     search_get_request_model=create_get_request_model(extensions),
     search_post_request_model=post_request_model,
+    collections_get_request_model=collections_get_request_model,
     items_get_request_model=items_get_request_model,
     response_class=ORJSONResponse,
     title=(os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"),
