@@ -3,10 +3,16 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
+# Changed
+
+- Update to latest available versions `stac-fastapi.api==5.2.0`, `stac-fastapi.pgstac==5.0.2` and `uvicorn==0.34.2`.
+  This mostly includes security fixes, minor performance improvements, and many additional STAC-API extension features
+  that are not yet enabled, but planned in a following release. 
+
 # Fixed
 
-- Fix `next` paging link in `/collections/{collectionID}/items` that was not correctly resolving the `token` parameter,
-  leading to an endless loop over the first paging items.
+- Fix `rel=next` paging link in `/collections/{collectionID}/items` that was not correctly resolving the `token`
+  parameter, leading to an endless loop over the first paging items.
 
 [1.0.1](https://github.com/crim-ca/stac-app/tree/1.0.1)
 ------------------------------------------------------------------------------------------------------------------
