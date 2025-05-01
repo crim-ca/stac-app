@@ -4,14 +4,20 @@
 import logging
 import os
 import time
-from typing import Optional
+from typing import Optional, Type, cast
 
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
-from stac_fastapi.api.models import create_get_request_model, create_post_request_model
+from stac_fastapi.api.models import (
+    ItemCollectionUri,
+    create_request_model,
+    create_get_request_model,
+    create_post_request_model
+)
+from stac_fastapi.types.search import APIRequest
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
@@ -34,6 +40,15 @@ logger = logging.getLogger("uvicorn.error")
 settings = Settings()
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
+
+items_get_request_model = cast(
+    Type[APIRequest],
+    create_request_model(
+        "ItemCollectionURI",
+        base_model=ItemCollectionUri,
+        mixins=[TokenPaginationExtension().GET],
+    )
+)
 
 extensions = [
     TransactionExtension(
@@ -58,9 +73,10 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 api = StacApi(
     settings=settings,
     extensions=extensions,
-    client=CoreCrudClient(post_request_model=post_request_model),
+    client=CoreCrudClient(pgstac_search_model=post_request_model),
     search_get_request_model=create_get_request_model(extensions),
     search_post_request_model=post_request_model,
+    items_get_request_model=items_get_request_model,
     response_class=ORJSONResponse,
     title=(os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"),
     description=(
