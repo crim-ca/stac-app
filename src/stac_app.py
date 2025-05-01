@@ -69,16 +69,16 @@ collections_get_request_model = cast(
     )
 )
 
-# class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvancedExtensionPostRequest):
-#     pass
+class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvancedExtensionPostRequest):
+    pass
 
 
-# @attr.s
-# class CollectionSearchPostClient(BaseCollectionSearchClient):
-#     def post_all_collections(
-#         self, search_request: CollectionSearchPostRequest, **kwargs
-#     ) -> ItemCollection:
-#         return search_request.model_dump()
+@attr.s
+class CollectionSearchPostClient(BaseCollectionSearchClient):
+    def post_all_collections(
+        self, search_request: CollectionSearchPostRequest, **kwargs
+    ) -> ItemCollection:
+        return search_request.model_dump()
 
 extensions = [
     TransactionExtension(
@@ -89,12 +89,13 @@ extensions = [
     QueryExtension(),
     SortExtension(),
     FieldsExtension(),
+    FreeTextAdvancedExtension(),
+    # FIXME: following 'Filter' variants are conflicting (duplicate GET model) - what are their differences???
     FilterExtension(client=FiltersClient()),
-    #FreeTextAdvancedExtension(),
-    #CollectionSearchExtension(),
-    #CollectionSearchPostExtension(client=CollectionSearchPostClient(), settings=settings),
-    #CollectionSearchFilterExtension(),
     #ItemCollectionFilterExtension(),
+    #CollectionSearchFilterExtension(),
+    #CollectionSearchExtension(),  # only GET
+    CollectionSearchPostExtension(client=CollectionSearchPostClient(), settings=settings),  # GET + POST
     TokenPaginationExtension(),
     PaginationExtension(),
 ]
