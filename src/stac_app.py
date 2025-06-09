@@ -15,7 +15,7 @@ from stac_fastapi.api.models import (
     ItemCollectionUri,
     create_request_model,
     create_get_request_model,
-    create_post_request_model
+    create_post_request_model,
 )
 from stac_fastapi.types.search import APIRequest
 from stac_fastapi.extensions.core import (
@@ -47,7 +47,7 @@ items_get_request_model = cast(
         "ItemCollectionURI",
         base_model=ItemCollectionUri,
         mixins=[TokenPaginationExtension().GET],
-    )
+    ),
 )
 
 extensions = [
