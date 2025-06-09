@@ -17,7 +17,7 @@ from stac_fastapi.api.models import (
     ItemCollectionUri,
     create_request_model,
     create_get_request_model,
-    create_post_request_model
+    create_post_request_model,
 )
 from stac_fastapi.types.stac import ItemCollection
 from stac_fastapi.types.search import APIRequest
@@ -58,7 +58,7 @@ items_get_request_model = cast(
         "ItemCollectionURI",
         base_model=ItemCollectionUri,
         mixins=[TokenPaginationExtension().GET],
-    )
+    ),
 )
 collections_get_request_model = cast(
     Type[APIRequest],
@@ -66,7 +66,7 @@ collections_get_request_model = cast(
         "CollectionsURI",
         base_model=EmptyRequest,
         mixins=[TokenPaginationExtension().GET, PaginationExtension().GET],
-    )
+    ),
 )
 
 
@@ -76,9 +76,7 @@ class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvan
 
 @attr.s
 class CollectionSearchPostClient(BaseCollectionSearchClient):
-    def post_all_collections(
-        self, search_request: CollectionSearchPostRequest, **kwargs
-    ) -> ItemCollection:
+    def post_all_collections(self, search_request: CollectionSearchPostRequest, **kwargs) -> ItemCollection:
         return search_request.model_dump()
 
 
@@ -94,9 +92,9 @@ extensions = [
     FreeTextAdvancedExtension(),
     # FIXME: following 'Filter' variants are conflicting (duplicate GET model) - what are their differences???
     FilterExtension(client=FiltersClient()),
-    #ItemCollectionFilterExtension(),
-    #CollectionSearchFilterExtension(),
-    #CollectionSearchExtension(),  # only GET
+    # ItemCollectionFilterExtension(),
+    # CollectionSearchFilterExtension(),
+    # CollectionSearchExtension(),  # only GET
     CollectionSearchPostExtension(client=CollectionSearchPostClient(), settings=settings),  # GET + POST
     TokenPaginationExtension(),
     PaginationExtension(),
