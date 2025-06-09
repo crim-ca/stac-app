@@ -69,6 +69,7 @@ collections_get_request_model = cast(
     )
 )
 
+
 class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvancedExtensionPostRequest):
     pass
 
@@ -79,6 +80,7 @@ class CollectionSearchPostClient(BaseCollectionSearchClient):
         self, search_request: CollectionSearchPostRequest, **kwargs
     ) -> ItemCollection:
         return search_request.model_dump()
+
 
 extensions = [
     TransactionExtension(
