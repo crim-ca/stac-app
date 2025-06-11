@@ -13,11 +13,10 @@ from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
     ItemCollectionUri,
-    create_request_model,
     create_get_request_model,
-    create_post_request_model
+    create_post_request_model,
+    create_request_model,
 )
-from stac_fastapi.types.search import APIRequest
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
@@ -33,6 +32,7 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.types.search import APIRequest
 
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
@@ -47,7 +47,7 @@ items_get_request_model = cast(
         "ItemCollectionURI",
         base_model=ItemCollectionUri,
         mixins=[TokenPaginationExtension().GET],
-    )
+    ),
 )
 
 extensions = [
