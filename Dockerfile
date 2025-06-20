@@ -1,4 +1,4 @@
-FROM python:3.13.2-slim
+FROM python:3.13.5-slim
 
 # see .dockerignore file for which files are included
 COPY ./requirements.txt /requirements.txt
