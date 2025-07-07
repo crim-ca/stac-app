@@ -14,15 +14,12 @@ from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
     ItemCollectionUri,
-    create_request_model,
     create_get_request_model,
     create_post_request_model,
 )
-from stac_fastapi.types.stac import ItemCollection
 from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
 from stac_fastapi.extensions.core import (
     CollectionSearchFilterExtension,
-    FreeTextAdvancedExtension,
     FieldsExtension,
     FilterExtension,
     ItemCollectionFilterExtension,
@@ -33,9 +30,6 @@ from stac_fastapi.extensions.core import (
     TransactionExtension,
 )
 from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension, CollectionSearchPostExtension
-from stac_fastapi.extensions.core.collection_search.client import BaseCollectionSearchClient
-from stac_fastapi.extensions.core.collection_search.request import BaseCollectionSearchPostRequest
-from stac_fastapi.extensions.core.free_text.request import FreeTextAdvancedExtensionPostRequest
 from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
 from stac_fastapi.extensions.core.free_text import FreeTextConformanceClasses, FreeTextAdvancedExtension
 from stac_fastapi.extensions.core.query import QueryConformanceClasses
