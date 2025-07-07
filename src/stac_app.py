@@ -57,12 +57,11 @@ search_extensions = [
     PaginationExtension(),
 ]
 search_get_request_model = cast(
-Union[Type[APIRequest], Type[BaseSearchGetRequest]],
-    create_get_request_model(search_extensions)
+    Union[Type[APIRequest], Type[BaseSearchGetRequest]], create_get_request_model(search_extensions)
 )
 search_post_request_model = cast(
     Union[Type[APIRequest], Type[BaseSearchPostRequest]],
-    create_post_request_model(search_extensions, base_model=PgstacSearch)
+    create_post_request_model(search_extensions, base_model=PgstacSearch),
 )
 
 # object creation/update/delete operations
@@ -86,7 +85,8 @@ collection_base_extensions = [
 #   Using only the 'GET /collections' for search, since 'POST /collections' search
 #   would conflict with Transaction extension to create/update/delete collections.
 collection_search_extension = CollectionSearchExtension.from_extensions(
-    collection_base_extensions + [
+    collection_base_extensions
+    + [
         CollectionSearchFilterExtension(client=FiltersClient()),
     ],
 )
@@ -96,8 +96,7 @@ collection_search_extension = CollectionSearchExtension.from_extensions(
 #     settings=settings,
 # )
 collections_get_request_model = cast(
-    Union[Type[APIRequest], Type[CollectionSearchExtension]],
-    collection_search_extension.GET
+    Union[Type[APIRequest], Type[CollectionSearchExtension]], collection_search_extension.GET
 )
 collection_extensions = collection_base_extensions + [collection_search_extension]
 
@@ -134,10 +133,7 @@ api = StacApi(
     collections_get_request_model=collections_get_request_model,
     items_get_request_model=items_get_request_model,
     response_class=ORJSONResponse,
-    title=(
-        os.getenv("STAC_FASTAPI_TITLE")
-        or "Data Analytics for Canadian Climate Services STAC API"
-    ),
+    title=(os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"),
     description=(
         os.getenv("STAC_FASTAPI_DESCRIPTION")
         or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
