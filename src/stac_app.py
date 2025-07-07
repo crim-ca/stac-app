@@ -4,7 +4,7 @@
 import logging
 import os
 import time
-from typing import Optional, Type, cast
+from typing import Optional, Type, Union, cast
 
 import attr
 import asyncpg
@@ -13,18 +13,15 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
-    EmptyRequest,
     ItemCollectionUri,
     create_request_model,
     create_get_request_model,
     create_post_request_model,
 )
 from stac_fastapi.types.stac import ItemCollection
-from stac_fastapi.types.search import APIRequest
+from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
 from stac_fastapi.extensions.core import (
-    CollectionSearchExtension,
     CollectionSearchFilterExtension,
-    CollectionSearchPostExtension,
     FreeTextAdvancedExtension,
     FieldsExtension,
     FilterExtension,
@@ -35,9 +32,14 @@ from stac_fastapi.extensions.core import (
     TokenPaginationExtension,
     TransactionExtension,
 )
+from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension, CollectionSearchPostExtension
 from stac_fastapi.extensions.core.collection_search.client import BaseCollectionSearchClient
 from stac_fastapi.extensions.core.collection_search.request import BaseCollectionSearchPostRequest
 from stac_fastapi.extensions.core.free_text.request import FreeTextAdvancedExtensionPostRequest
+from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
+from stac_fastapi.extensions.core.free_text import FreeTextConformanceClasses, FreeTextAdvancedExtension
+from stac_fastapi.extensions.core.query import QueryConformanceClasses
+from stac_fastapi.extensions.core.sort import SortConformanceClasses
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
@@ -52,55 +54,80 @@ settings = Settings()
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
-items_get_request_model = cast(
-    Type[APIRequest],
-    create_request_model(
-        "ItemCollectionURI",
-        base_model=ItemCollectionUri,
-        mixins=[TokenPaginationExtension().GET],
-    ),
+
+# /search
+search_extensions = [
+    QueryExtension(),
+    SortExtension(),
+    FieldsExtension(),
+    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.SEARCH_ADVANCED]),
+    FilterExtension(client=FiltersClient()),
+    PaginationExtension(),
+]
+search_get_request_model = cast(
+Union[Type[APIRequest], Type[BaseSearchGetRequest]],
+    create_get_request_model(search_extensions)
 )
-collections_get_request_model = cast(
-    Type[APIRequest],
-    create_request_model(
-        "CollectionsURI",
-        base_model=EmptyRequest,
-        mixins=[TokenPaginationExtension().GET, PaginationExtension().GET],
-    ),
+search_post_request_model = cast(
+    Union[Type[APIRequest], Type[BaseSearchPostRequest]],
+    create_post_request_model(search_extensions, base_model=PgstacSearch)
 )
 
-
-class CollectionSearchPostRequest(BaseCollectionSearchPostRequest, FreeTextAdvancedExtensionPostRequest):
-    pass
-
-
-@attr.s
-class CollectionSearchPostClient(BaseCollectionSearchClient):
-    def post_all_collections(self, search_request: CollectionSearchPostRequest, **kwargs) -> ItemCollection:
-        return search_request.model_dump()
-
-
-extensions = [
+# object creation/update/delete operations
+transaction_extensions = [
     TransactionExtension(
         client=TransactionsClient(),
         settings=settings,
         response_class=ORJSONResponse,
     ),
-    QueryExtension(),
-    SortExtension(),
-    FieldsExtension(),
-    FreeTextAdvancedExtension(),
-    # FIXME: following 'Filter' variants are conflicting (duplicate GET model) - what are their differences???
-    FilterExtension(client=FiltersClient()),
-    # ItemCollectionFilterExtension(),
-    # CollectionSearchFilterExtension(),
-    # CollectionSearchExtension(),  # only GET
-    CollectionSearchPostExtension(client=CollectionSearchPostClient(), settings=settings),  # GET + POST
-    TokenPaginationExtension(),
-    PaginationExtension(),
 ]
 
-post_request_model = create_post_request_model(extensions, base_model=PgstacSearch)
+# /collections
+collection_base_extensions = [
+    QueryExtension(conformance_classes=[QueryConformanceClasses.COLLECTIONS]),
+    SortExtension(conformance_classes=[SortConformanceClasses.COLLECTIONS]),
+    FieldsExtension(conformance_classes=[FieldsConformanceClasses.COLLECTIONS]),
+    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.COLLECTIONS_ADVANCED]),
+    TokenPaginationExtension(),
+]
+# NOTE:
+#   Using only the 'GET /collections' for search, since 'POST /collections' search
+#   would conflict with Transaction extension to create/update/delete collections.
+collection_search_extension = CollectionSearchExtension.from_extensions(
+    collection_base_extensions + [
+        CollectionSearchFilterExtension(client=FiltersClient()),
+    ],
+)
+# collection_search_extension = CollectionSearchPostExtension.from_extensions(  # GET + POST
+#     collection_base_extensions,
+#     client=CollectionSearchPostClient(),
+#     settings=settings,
+# )
+collections_get_request_model = cast(
+    Union[Type[APIRequest], Type[CollectionSearchExtension]],
+    collection_search_extension.GET
+)
+collection_extensions = collection_base_extensions + [collection_search_extension]
+
+# /collections/{collectionID}/items
+items_extensions = [
+    QueryExtension(conformance_classes=[QueryConformanceClasses.ITEMS]),
+    SortExtension(conformance_classes=[SortConformanceClasses.ITEMS]),
+    FieldsExtension(conformance_classes=[FieldsConformanceClasses.ITEMS]),
+    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.ITEMS_ADVANCED]),
+    ItemCollectionFilterExtension(client=FiltersClient()),
+    TokenPaginationExtension(),
+]
+items_get_request_model = cast(
+    Type[APIRequest],
+    create_get_request_model(
+        extensions=items_extensions,
+        base_model=ItemCollectionUri,
+    ),
+)
+
+app_extensions = search_extensions + transaction_extensions + collection_extensions + items_extensions
+
 router_prefix = os.environ.get("ROUTER_PREFIX")
 router_prefix_str = router_prefix.rstrip("/") if router_prefix else ""
 
@@ -108,14 +135,17 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 api = StacApi(
     settings=settings,
-    extensions=extensions,
-    client=CoreCrudClient(pgstac_search_model=post_request_model),
-    search_get_request_model=create_get_request_model(extensions),
-    search_post_request_model=post_request_model,
+    extensions=app_extensions,
+    client=CoreCrudClient(pgstac_search_model=search_post_request_model),
+    search_get_request_model=search_get_request_model,
+    search_post_request_model=search_post_request_model,
     collections_get_request_model=collections_get_request_model,
     items_get_request_model=items_get_request_model,
     response_class=ORJSONResponse,
-    title=(os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"),
+    title=(
+        os.getenv("STAC_FASTAPI_TITLE")
+        or "Data Analytics for Canadian Climate Services STAC API"
+    ),
     description=(
         os.getenv("STAC_FASTAPI_DESCRIPTION")
         or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
