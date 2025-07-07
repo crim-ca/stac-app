@@ -17,7 +17,6 @@ from stac_fastapi.api.models import (
     create_get_request_model,
     create_post_request_model,
 )
-from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
 from stac_fastapi.extensions.core import (
     CollectionSearchFilterExtension,
     FieldsExtension,
@@ -40,6 +39,7 @@ from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
 from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
+from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
 
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
@@ -47,7 +47,6 @@ logger = logging.getLogger("uvicorn.error")
 settings = Settings()
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
-
 
 # /search
 search_extensions = [
