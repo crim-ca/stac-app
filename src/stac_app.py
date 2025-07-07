@@ -1,12 +1,11 @@
 """FastAPI application using PGStac."""
 
-# Based on stac-fastapi/stac_fastapi/pgstac/stac_fastapi/pgstac/app.py
+# Based on https://github.com/stac-utils/stac-fastapi-pgstac/blob/main/stac_fastapi/pgstac/app.py
 import logging
 import os
 import time
 from typing import Optional, Type, Union, cast
 
-import attr
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
@@ -28,9 +27,9 @@ from stac_fastapi.extensions.core import (
     TokenPaginationExtension,
     TransactionExtension,
 )
-from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension, CollectionSearchPostExtension
+from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension
 from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
-from stac_fastapi.extensions.core.free_text import FreeTextConformanceClasses, FreeTextAdvancedExtension
+from stac_fastapi.extensions.core.free_text import FreeTextAdvancedExtension, FreeTextConformanceClasses
 from stac_fastapi.extensions.core.query import QueryConformanceClasses
 from stac_fastapi.extensions.core.sort import SortConformanceClasses
 from stac_fastapi.pgstac.config import Settings
