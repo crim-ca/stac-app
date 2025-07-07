@@ -19,7 +19,7 @@
   means the underlying PostgreSQL version must be migrated to 17.
   
   _**NOTE**_: <br>
-  Add `CollectionSearchPostExtension` is purposely omitted as it would conflict with the `Transaction` extension
+  The `CollectionSearchPostExtension` is purposely omitted as it would conflict with the `Transaction` extension
   that both uses the same `POST /collections` enpodint for search and collection creation respectively.
   
 
