@@ -5,8 +5,8 @@
 
 # Changed
 
-- Add `CollectionSearchPostExtension` and its underlying `CollectionSearchExtension` base class to support
-  the `pgstac` `collection_search` operator for both `GET|POST /collections`. These classes are further extended
+- Add `CollectionSearchExtension` base class to support
+  the `pgstac` `collection_search` operator for both `GET /collections`. This class us further extended
   using `FreeTextAdvancedExtension` to allow free-form `q` parameter text search of the collection or its items
   across `description`, `title`, `keywords` and potentially other supported attributes (as per collection queryables).
   The ["advanced"](https://github.com/stac-api-extensions/freetext-search?tab=readme-ov-file#advanced) portion of
@@ -17,6 +17,11 @@
   Because this extension relies on a specific SQL function `collection_search` and its adjusted feature
   for parameter `q`, [`pgstac>=0.9.2`](https://stac-utils.github.io/pgstac/release-notes/#v092) is required. This
   means the underlying PostgreSQL version must be migrated to 17.
+  
+  _**NOTE**_: <br>
+  Add `CollectionSearchPostExtension` is purposely omitted as it would conflict with the `Transaction` extension
+  that both uses the same `POST /collections` enpodint for search and collection creation respectively.
+  
 
 # Fixed
 
