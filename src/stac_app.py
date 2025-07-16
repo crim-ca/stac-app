@@ -10,12 +10,14 @@ import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
+from packaging.version import Version
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
     ItemCollectionUri,
     create_get_request_model,
     create_post_request_model,
 )
+from stac_fastapi.api.version import __version__ as stac_fastapi_version
 from stac_fastapi.extensions.core import (
     CollectionSearchFilterExtension,
     FieldsExtension,
@@ -167,9 +169,15 @@ async def _load_script(script_basename: str, conn: asyncpg.Connection) -> None:
 async def startup_event() -> None:
     """Connect to database on startup and load custom functions."""
     max_retries = 60
+
+    # forward-compatibility setting
+    connect_to_db_kwargs = {}
+    if Version(stac_fastapi_version) >= Version("6.0"):
+        connect_to_db_kwargs["add_write_connection_pool"] = True
+
     for retry in range(max_retries):
         try:
-            await connect_to_db(app)
+            await connect_to_db(app, **connect_to_db_kwargs)
             break
         except Exception as err:
             logger.warning(

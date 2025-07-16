@@ -21,11 +21,10 @@
   _**NOTE**_: <br>
   The `CollectionSearchPostExtension` is purposely omitted as it would conflict with the `Transaction` extension
   that both uses the same `POST /collections` enpodint for search and collection creation respectively.
-  
 
 # Fixed
 
-- n/a
+- Fix breaking PG connection setting when using ``stac-fastapi>=6``.
 
 [1.1.0](https://github.com/crim-ca/stac-app/tree/1.1.0)
 ------------------------------------------------------------------------------------------------------------------
