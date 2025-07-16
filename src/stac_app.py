@@ -4,14 +4,13 @@
 import logging
 import os
 import time
-from packaging.version import Version
 from typing import Optional, Type, cast
 
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
-from stac_fastapi.api.version import __version__ as stac_fastapi_version
+from packaging.version import Version
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
     ItemCollectionUri,
@@ -19,6 +18,7 @@ from stac_fastapi.api.models import (
     create_post_request_model,
     create_request_model,
 )
+from stac_fastapi.api.version import __version__ as stac_fastapi_version
 from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
