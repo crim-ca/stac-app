@@ -45,7 +45,7 @@ from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSear
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
 
-settings = Settings()
+settings = Settings(validate_extensions=True)
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
@@ -59,7 +59,8 @@ search_extensions = [
     PaginationExtension(),
 ]
 search_get_request_model = cast(
-    Union[Type[APIRequest], Type[BaseSearchGetRequest]], create_get_request_model(search_extensions)
+    Union[Type[APIRequest], Type[BaseSearchGetRequest]],
+    create_get_request_model(search_extensions)
 )
 search_post_request_model = cast(
     Union[Type[APIRequest], Type[BaseSearchPostRequest]],
