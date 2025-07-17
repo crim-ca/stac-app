@@ -59,8 +59,7 @@ search_extensions = [
     PaginationExtension(),
 ]
 search_get_request_model = cast(
-    Union[Type[APIRequest], Type[BaseSearchGetRequest]],
-    create_get_request_model(search_extensions)
+    Union[Type[APIRequest], Type[BaseSearchGetRequest]], create_get_request_model(search_extensions)
 )
 search_post_request_model = cast(
     Union[Type[APIRequest], Type[BaseSearchPostRequest]],
