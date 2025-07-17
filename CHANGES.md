@@ -3,10 +3,6 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
-# Changed
-
-- n/a
-
 # Fixed
 
 - Fix breaking PG connection setting when using ``stac-fastapi>=6``.
