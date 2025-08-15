@@ -83,12 +83,14 @@ search_extensions = [
     QueryExtension(),
     SortExtension(),
     FieldsExtension(),
-    FreeTextCombinedExtension(conformance_classes=[
-        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
-        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
-        FreeTextConformanceClasses.SEARCH,
-        FreeTextConformanceClasses.SEARCH_ADVANCED,
-    ]),
+    FreeTextCombinedExtension(
+        conformance_classes=[
+            # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+            # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+            FreeTextConformanceClasses.SEARCH,
+            FreeTextConformanceClasses.SEARCH_ADVANCED,
+        ]
+    ),
     FilterExtension(client=FiltersClient()),
     PaginationExtension(),
 ]
@@ -114,12 +116,14 @@ collection_base_extensions = [
     QueryExtension(conformance_classes=[QueryConformanceClasses.COLLECTIONS]),
     SortExtension(conformance_classes=[SortConformanceClasses.COLLECTIONS]),
     FieldsExtension(conformance_classes=[FieldsConformanceClasses.COLLECTIONS]),
-    FreeTextAdvancedExtension(conformance_classes=[
-        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
-        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
-        FreeTextConformanceClasses.COLLECTIONS,
-        FreeTextConformanceClasses.COLLECTIONS_ADVANCED,
-    ]),
+    FreeTextAdvancedExtension(
+        conformance_classes=[
+            # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+            # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+            FreeTextConformanceClasses.COLLECTIONS,
+            FreeTextConformanceClasses.COLLECTIONS_ADVANCED,
+        ]
+    ),
     TokenPaginationExtension(),
 ]
 # NOTE:
@@ -146,12 +150,14 @@ items_extensions = [
     QueryExtension(conformance_classes=[QueryConformanceClasses.ITEMS]),
     SortExtension(conformance_classes=[SortConformanceClasses.ITEMS]),
     FieldsExtension(conformance_classes=[FieldsConformanceClasses.ITEMS]),
-    FreeTextAdvancedExtension(conformance_classes=[
-        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
-        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
-        FreeTextConformanceClasses.ITEMS,
-        FreeTextConformanceClasses.ITEMS_ADVANCED,
-    ]),
+    FreeTextAdvancedExtension(
+        conformance_classes=[
+            # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+            # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+            FreeTextConformanceClasses.ITEMS,
+            FreeTextConformanceClasses.ITEMS_ADVANCED,
+        ]
+    ),
     ItemCollectionFilterExtension(client=FiltersClient()),
     TokenPaginationExtension(),
 ]
