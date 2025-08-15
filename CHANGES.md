@@ -3,6 +3,51 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
+# Changed
+
+- Add `CollectionSearchExtension` base class to support the `pgstac` `collection_search` operator 
+  for `GET /collections` request.
+
+  _**NOTE**_: <br>
+  Because this extension relies on a specific SQL function `collection_search` and its adjusted feature
+  for parameter `q`, [`pgstac>=0.9.2`](https://stac-utils.github.io/pgstac/release-notes/#v092) is required. This
+  means the underlying PostgreSQL version **MUST** be migrated to 17.
+  
+  _**NOTE**_: <br>
+  The `CollectionSearchPostExtension` is *purposely* omitted as it would conflict with the `Transaction` extension
+  that both uses the same `POST /collections` endpoint for search and collection creation respectively.
+
+- Extended search parameters using `FreeTextAdvancedExtension` to allow
+  free-form `q` parameter text search of the collection or its items
+  across `description`, `title`, `keywords`.
+
+  The ["advanced"](https://github.com/stac-api-extensions/freetext-search?tab=readme-ov-file#advanced) portion of
+  the extension allows additional operators such as `OR`, `AND`, `+`, `-` and `()` within the text search to form
+  complex search criteria.
+
+  To ease user experience, ["basic"](https://github.com/stac-api-extensions/freetext-search?tab=readme-ov-file#basic)
+  free-text search is also supported seamlessly, to allow simpler queries. Normally, both extensions would conflict
+  between each other using the same `q` parameter, but little additional logic makes it possible to support both.
+
+  Enabled requests using `q`:
+
+    - `POST /search` with `{"q": ["term", "other"]}` (basic free-text search form)
+    - `POST /search` with `{"q": "term OR other"}` (advanced free-text search form)
+    - `GET /search?q=term,other`
+    - `GET /search?q=term OR other`
+    - `GET /collections?q=term,other`
+    - `GET /collections?q=term OR other`
+    - `GET /collections/{collectionId}/items?q=term,other`
+    - `GET /collections/{collectionId}/items?q=term OR other`
+
+  For the same `Transaction` extension reason as above, `POST` cannot be used elsewhere than on `/search` endpoint.
+
+- Extended search parameters using `FreeTextAdvancedExtension` to allow
+
+- Enabled `Settings(validate_extensions=True)` when configuring the `StacAPI` application.
+  This ensures that, when a STAC Collection or Item is POST'ed to the API, all the `stac_extensions` that it declares
+  will also be validated against their respective schemas, rather than limiting itself only to core STAC definitions.
+
 # Fixed
 
 - Fix breaking PG connection setting when using ``stac-fastapi>=6``.
