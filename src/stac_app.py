@@ -73,6 +73,7 @@ class FreeTextCombinedExtensionPostRequest(BaseModel):
 
 
 class FreeTextCombinedExtension(FreeTextAdvancedExtension):
+    """Free-Text Search extension that allows simultaneous use of Basic and Advanced formats."""
     # POST needs override to deal with basic:list[str] vs advanced:str
     # GET uses 'q: str' for both basic and advanced
     POST = FreeTextCombinedExtensionPostRequest
