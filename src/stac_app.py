@@ -4,13 +4,15 @@
 import logging
 import os
 import time
-from typing import Optional, Type, Union, cast
+from typing import Annotated, Optional, Type, Union, cast
 
 import asyncpg
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
 from packaging.version import Version
+from pydantic import BaseModel, Field
+from pydantic.functional_serializers import PlainSerializer
 from stac_fastapi.api.app import StacApi
 from stac_fastapi.api.models import (
     ItemCollectionUri,
@@ -49,12 +51,44 @@ settings = Settings(validate_extensions=True)
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
+
+class FreeTextCombinedExtensionPostRequest(BaseModel):
+    """Free-text Extension POST request model allowing for either Basic or Advanced formats."""
+
+    q: Annotated[
+        Optional[Union[str, list[str]]],
+        PlainSerializer(
+            lambda x: " OR ".join(x) if isinstance(x, list) else x,
+            return_type=str,
+            when_used="json",
+        ),
+    ] = Field(
+        None,
+        description=(
+            "Parameter to perform free-text queries against STAC metadata. "
+            "Basic free-text search is performed when using an array of words. "
+            "Advanced free-text search is performed when using a string containing the expression."
+        ),
+    )
+
+
+class FreeTextCombinedExtension(FreeTextAdvancedExtension):
+    # POST needs override to deal with basic:list[str] vs advanced:str
+    # GET uses 'q: str' for both basic and advanced
+    POST = FreeTextCombinedExtensionPostRequest
+
+
 # /search
 search_extensions = [
     QueryExtension(),
     SortExtension(),
     FieldsExtension(),
-    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.SEARCH_ADVANCED]),
+    FreeTextCombinedExtension(conformance_classes=[
+        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+        FreeTextConformanceClasses.SEARCH,
+        FreeTextConformanceClasses.SEARCH_ADVANCED,
+    ]),
     FilterExtension(client=FiltersClient()),
     PaginationExtension(),
 ]
@@ -81,7 +115,12 @@ collection_base_extensions = [
     QueryExtension(conformance_classes=[QueryConformanceClasses.COLLECTIONS]),
     SortExtension(conformance_classes=[SortConformanceClasses.COLLECTIONS]),
     FieldsExtension(conformance_classes=[FieldsConformanceClasses.COLLECTIONS]),
-    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.COLLECTIONS_ADVANCED]),
+    FreeTextAdvancedExtension(conformance_classes=[
+        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+        FreeTextConformanceClasses.COLLECTIONS,
+        FreeTextConformanceClasses.COLLECTIONS_ADVANCED,
+    ]),
     TokenPaginationExtension(),
 ]
 # NOTE:
@@ -108,7 +147,12 @@ items_extensions = [
     QueryExtension(conformance_classes=[QueryConformanceClasses.ITEMS]),
     SortExtension(conformance_classes=[SortConformanceClasses.ITEMS]),
     FieldsExtension(conformance_classes=[FieldsConformanceClasses.ITEMS]),
-    FreeTextAdvancedExtension(conformance_classes=[FreeTextConformanceClasses.ITEMS_ADVANCED]),
+    FreeTextAdvancedExtension(conformance_classes=[
+        # both basic/advanced are handled simultaneously with the same query parameters and their respective formats
+        # however, only one of the extension class is added explicitly to avoid parameter conflict when loading the API
+        FreeTextConformanceClasses.ITEMS,
+        FreeTextConformanceClasses.ITEMS_ADVANCED,
+    ]),
     ItemCollectionFilterExtension(client=FiltersClient()),
     TokenPaginationExtension(),
 ]
