@@ -42,6 +42,12 @@
 
   For the same `Transaction` extension reason as above, `POST` cannot be used elsewhere than on `/search` endpoint.
 
+- Extended search parameters using `FreeTextAdvancedExtension` to allow
+
+- Enabled `Settings(validate_extensions=True)` when configuring the `StacAPI` application.
+  This ensures that, when a STAC Collection or Item is POST'ed to the API, all the `stac_extensions` that it declares
+  will also be validated against their respective schemas, rather than limiting itself only to core STAC definitions.
+
 # Fixed
 
 - Fix breaking PG connection setting when using ``stac-fastapi>=6``.
