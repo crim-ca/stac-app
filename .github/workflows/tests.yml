@@ -17,7 +17,12 @@ jobs:
     services:
       postgres:
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgis
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgis
         image: ghcr.io/stac-utils/pgstac:v0.9.8
         options: >-
           --health-cmd pg_isready
@@ -46,7 +51,8 @@ jobs:
       - name: Run Test
         run: |
           docker run --rm -d \
-            --network host \
+            --network ${{ job.container.network }} \
+            -p 8000:8000 \
             -e PGPASSWORD=postgres \
             -e PGHOST=postgres \
             -e PGDATABASE=postgres \
@@ -58,6 +64,7 @@ jobs:
             -e ROUTER_PREFIX=/stac \
             --name stac-app \
             ${{ steps.meta.outputs.tags }}
+          docker ps
           curl \
             --retry 3 \
             --retry-delay 5 \
