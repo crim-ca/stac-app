@@ -73,5 +73,5 @@ jobs:
               --retry-delay 5 \
               --retry-max-time 30 \
               --retry-connrefused \
-              "http://localhost:8000/stac/" \
+              "http://stac-app:8000/stac/" \
               | grep '"type":"Catalog","id":"stac-fastapi"'
