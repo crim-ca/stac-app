@@ -65,10 +65,13 @@ jobs:
             --name stac-app \
             ${{ steps.meta.outputs.tags }}
           docker ps
-          curl \
-            --retry 3 \
-            --retry-delay 5 \
-            --retry-max-time 30 \
-            --retry-connrefused \
-            "http://localhost:8000/stac/" \
-            | grep '"type":"Catalog","id":"stac-fastapi"'
+          docker run --rm \
+            --network ${{ job.container.network }} \
+            curlimages/curl:8.7.1 \
+            curl \
+              --retry 3 \
+              --retry-delay 5 \
+              --retry-max-time 30 \
+              --retry-connrefused \
+              "http://localhost:8000/stac/" \
+              | grep '"type":"Catalog","id":"stac-fastapi"'
