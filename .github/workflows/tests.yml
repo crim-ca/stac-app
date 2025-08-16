@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-docker:
+    name: Build STAC App Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build Docker Image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+
+    outputs:
+      stac-app-docker-tag: ${{ steps.meta.outputs.tags }}
+
+  test-docker:
+    name: Test STAC App
+    needs: [build-docker]
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: ghcr.io/stac-utils/pgstac:v0.9.8
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    container:
+      image: ${{ needs.build-docker.outputs.stac-app-docker-tag }}
+      env:
+        PGPASSWORD: postgres
+        PGHOST: postgres
+        PGDATABASE: postgres
+        PGUSER: postgres
+
+    steps:
+      - name: Run Test
+        run: |
+          curl -f http://localhost:8000/stac | grep '"type":"Catalog","id":"stac-fastapi"'
