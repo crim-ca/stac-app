@@ -3,7 +3,10 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/master)
 ------------------------------------------------------------------------------------------------------------------
 
-[//]: # (list changes here, using '-' for each new entry, remove this when items are added)
+- Fix missing `packaging` dependency.
+- Add a CI test building the Docker and doing a `curl` request on the landing page to ensure the API definition
+  can at the very least start without error. A DB connection is also used to validate that PostgreSQL is reachable
+  from the API service container using basic configurations.
 
 [2.0.0](https://github.com/crim-ca/stac-app/tree/2.0.0)
 ------------------------------------------------------------------------------------------------------------------
