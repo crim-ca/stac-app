@@ -7,7 +7,6 @@ on:
   pull_request: {}
 
 env:
-  REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -23,11 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      # make it available for the test job
-      - name: Save Docker image as tarball
-        run: docker save -o stac-app-image.tar ${{ steps.meta.outputs.tags }}
+          images: ${{ env.IMAGE_NAME }}
 
       - name: Build Docker Image
         id: push
@@ -36,6 +31,10 @@ jobs:
           context: .
           push: false
           tags: ${{ steps.meta.outputs.tags }}
+
+      # make it available for the test job
+      - name: Save Docker image as tarball
+        run: docker save -o stac-app-image.tar ${{ steps.meta.outputs.tags }}
 
     outputs:
       stac-app-docker-tag: ${{ steps.meta.outputs.tags }}
