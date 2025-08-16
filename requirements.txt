@@ -1,3 +1,4 @@
+packaging==25.0
 stac-fastapi.api==6.0.0
 stac-fastapi.pgstac[validation]==6.0.0
 uvicorn==0.35.0

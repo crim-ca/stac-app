@@ -1,0 +1,77 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-docker:
+    name: Test STAC App Docker Image
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgis
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgis
+        image: ghcr.io/stac-utils/pgstac:v0.9.8
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+
+      - name: Build Docker Image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+
+      - name: Run Test
+        run: |
+          docker run --rm -d \
+            --network ${{ job.container.network }} \
+            -p 8000:8000 \
+            -e PGPASSWORD=postgres \
+            -e PGHOST=postgres \
+            -e PGDATABASE=postgres \
+            -e PGUSER=postgres \
+            -e POSTGRES_DBNAME=postgis \
+            -e POSTGRES_HOST_READER=postgres \
+            -e POSTGRES_HOST_WRITER=postgres \
+            -e POSTGRES_PORT=5432 \
+            -e ROUTER_PREFIX=/stac \
+            --name stac-app \
+            ${{ steps.meta.outputs.tags }}
+          docker ps
+          docker run --rm \
+            --network ${{ job.container.network }} \
+            curlimages/curl:8.7.1 \
+            curl \
+              --retry 3 \
+              --retry-delay 5 \
+              --retry-max-time 30 \
+              --retry-connrefused \
+              "http://stac-app:8000/stac/" \
+              | grep '"type":"Catalog","id":"stac-fastapi"'
