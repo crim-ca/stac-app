@@ -7,7 +7,6 @@ on:
   pull_request: {}
 
 env:
-  REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -23,7 +22,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }}
+
+      # make it available for the test job
+      - name: Save Docker image as tarball
+        run: docker save -o stac-app-image.tar ${{ steps.meta.outputs.tags }}
 
       - name: Build Docker Image
         id: push
@@ -52,15 +55,29 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    container:
-      image: ${{ needs.build-docker.outputs.stac-app-docker-tag }}
-      env:
-        PGPASSWORD: postgres
-        PGHOST: postgres
-        PGDATABASE: postgres
-        PGUSER: postgres
-
     steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: stac-app-image
+
+      - name: Load Docker image
+        run: docker load -i stac-app-image.tar
+
       - name: Run Test
         run: |
-          curl -f http://localhost:8000/stac | grep '"type":"Catalog","id":"stac-fastapi"'
+          docker run --rm -d \
+            --network host \
+            -e PGPASSWORD=postgres \
+            -e PGHOST=postgres \
+            -e PGDATABASE=postgres \
+            -e PGUSER=postgres \
+            --name stac-app \
+            ${{ needs.build-docker.outputs.stac-app-docker-tag }}
+          curl \
+            --retry 3 \
+            --retry-delay 5 \
+            --retry-max-time 30 \
+            --retry-connrefused \
+            http://localhost:8000/stac \
+            | grep '"type":"Catalog","id":"stac-fastapi"'
