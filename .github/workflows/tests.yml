@@ -11,8 +11,19 @@ env:
 
 jobs:
   build-docker:
-    name: Build STAC App Docker Image
+    name: Test STAC App Docker Image
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: ghcr.io/stac-utils/pgstac:v0.9.8
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout
@@ -32,44 +43,6 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
 
-      # make it available for the test job
-      - name: Save Docker image as tarball
-        run: docker save -o stac-app-image.tar ${{ steps.meta.outputs.tags }}
-
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: stac-app-image
-          path: stac-app-image.tar
-
-    outputs:
-      stac-app-docker-tag: ${{ steps.meta.outputs.tags }}
-
-  test-docker:
-    name: Test STAC App
-    needs: [build-docker]
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        env:
-          POSTGRES_PASSWORD: postgres
-        image: ghcr.io/stac-utils/pgstac:v0.9.8
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Download image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: stac-app-image
-
-      - name: Load Docker image
-        run: docker load -i stac-app-image.tar
-
       - name: Run Test
         run: |
           docker run --rm -d \
@@ -84,7 +57,7 @@ jobs:
             -e POSTGRES_PORT=5432 \
             -e ROUTER_PREFIX=/stac \
             --name stac-app \
-            ${{ needs.build-docker.outputs.stac-app-docker-tag }}
+            ${{ steps.meta.outputs.tags }}
           curl \
             --retry 3 \
             --retry-delay 5 \
