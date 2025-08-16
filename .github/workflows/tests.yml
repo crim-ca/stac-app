@@ -20,13 +20,13 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build Docker Image
         id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: false
@@ -35,6 +35,12 @@ jobs:
       # make it available for the test job
       - name: Save Docker image as tarball
         run: docker save -o stac-app-image.tar ${{ steps.meta.outputs.tags }}
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stac-app-image
+          path: stac-app-image.tar
 
     outputs:
       stac-app-docker-tag: ${{ steps.meta.outputs.tags }}
