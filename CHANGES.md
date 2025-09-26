@@ -4,6 +4,11 @@
 ------------------------------------------------------------------------------------------------------------------
 
 - Refactor repository to employ `pyproject.toml`, `bump-my-version` and `Makefile` DevOps utilities.
+- Fix `rel: items` links causing many duplicate and invalid references in responses if the submitted STAC Collections
+  or Items contained such references at creation. These links are now ignored given their special significance
+  (relates to [stac-utils/stac-fastapi-pgstac#294](https://github.com/stac-utils/stac-fastapi-pgstac/pull/294),
+  [stac-utils/stac-fastapi-pgstac#285](https://github.com/stac-utils/stac-fastapi-pgstac/issues/285) and
+  [crim-ca/stac-populator#109](https://github.com/crim-ca/stac-populator/issues/109)).
 
 [2.0.1](https://github.com/crim-ca/stac-app/tree/2.0.1)
 ------------------------------------------------------------------------------------------------------------------
