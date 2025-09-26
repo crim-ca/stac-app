@@ -1,9 +1,15 @@
 FROM python:3.13.5-slim
+LABEL description.short="STAC Populator"
+LABEL description.long="CRIM implementation of FastAPI application for SpatioTemporal Asset Catalogs (STAC) for bird-house platform."
+LABEL maintainer="Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
+LABEL vendor="CRIM"
+LABEL version="2.0.1"
 
 # see .dockerignore file for which files are included
-COPY ./requirements.txt /requirements.txt
+COPY LICENSE ./
+COPY ./pyproject.toml pyproject.toml
 
-RUN python -m pip install -r /requirements.txt
+RUN pip install . && rm pyproject.toml
 
 COPY ./src/ /app
 
