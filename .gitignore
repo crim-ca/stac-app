@@ -22,6 +22,9 @@ env.docker
 
 # Python
 __pycache__/
+**/*.egg
+**/*.egg-info
+build/
 
 # virtual environments
 venv/

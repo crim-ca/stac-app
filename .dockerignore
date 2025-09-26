@@ -1,4 +1,5 @@
 *
-!requirements.txt
+!LICENSE
+!pyproject.toml
 !src/
 src/**/__pycache__
