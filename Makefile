@@ -3,7 +3,7 @@ MAKEFILE_NAME := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 -include Makefile.config
 APP_ROOT    := $(abspath $(lastword $(MAKEFILE_NAME))/..)
 APP_NAME    := stac-app
-APP_VERSION ?= 2.0.1
+APP_VERSION ?= 2.0.2
 
 DOCKER_TAG := ghcr.io/crim-ca/stac-app:$(APP_VERSION)
 DOCKER_XARGS ?=

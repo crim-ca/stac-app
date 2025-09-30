@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+<!-- insert list items of new changes here -->
+
+[2.0.2](https://github.com/crim-ca/stac-app/tree/2.0.2) (2025-09-30)
+------------------------------------------------------------------------------------------------------------------
+
 - Refactor repository to employ `pyproject.toml`, `bump-my-version` and `Makefile` DevOps utilities.
 - Fix `rel: items` links causing many duplicate and invalid references in responses if the submitted STAC Collections
   or Items contained such references at creation. These links are now ignored given their special significance
