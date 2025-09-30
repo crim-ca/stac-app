@@ -120,13 +120,18 @@ replace = "LABEL version=\"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "CHANGES.md"
-search = "## [Unreleased](https://github.com/crim-ca/stac-app) (latest)"
+search = """
+[Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
+------------------------------------------------------------------------------------------------------------------
+"""
 replace = """
-## [Unreleased](https://github.com/crim-ca/stac-app) (latest)
+[Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
+------------------------------------------------------------------------------------------------------------------
 
 <!-- insert list items of new changes here -->
 
-## [{new_version}](https://github.com/crim-ca/stac-app/tree/{new_version}) ({now:%Y-%m-%d})
+[{new_version}](https://github.com/crim-ca/stac-app/tree/{new_version}) ({now:%Y-%m-%d})
+------------------------------------------------------------------------------------------------------------------
 """
 
 [[tool.bumpversion.files]]

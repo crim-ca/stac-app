@@ -1,6 +1,6 @@
 # Changes
 
-[Unreleased](https://github.com/crim-ca/stac-app/tree/master)
+[Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
 - Refactor repository to employ `pyproject.toml`, `bump-my-version` and `Makefile` DevOps utilities.
