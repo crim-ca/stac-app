@@ -1,6 +1,6 @@
 # STAC API implementation for [Birdhouse](https://github.com/bird-house/birdhouse-deploy/tree/master/birdhouse)
 
-[![Latest Version](https://img.shields.io/badge/latest%20version-2.0.1-blue?logo=github)](https://github.com/crim-ca/stac-app/tree/2.0.1)
+[![Latest Version](https://img.shields.io/badge/latest%20version-2.0.2-blue?logo=github)](https://github.com/crim-ca/stac-app/tree/2.0.2)
 [![License](https://img.shields.io/github/license/crim-ca/stac-app)](https://github.com/crim-ca/stac-app/blob/main/LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-crim--ca%2Fstac--app-blue?logo=docker)](https://github.com/crim-ca/stac-app/pkgs/container/stac-app)
 
@@ -35,7 +35,7 @@ We recommend that you update the queryables after you add/remove/update any item
 Custom queryables are enabled by default. To disable this feature and only use the 
 queryables provided by [stac-fastapi-pgstac](https://github.com/stac-utils/stac-fastapi-pgstac), set the `STAC_DEFAULT_QUERYABLES` environment variable to `1`.
 
-```sh
+```shell
 export STAC_DEFAULT_QUERYABLES=1
 ```
 
@@ -59,25 +59,25 @@ in the database.
 Custom summaries are enabled by default. To disable this feature and set the `STAC_DEFAULT_SUMMARIES` 
 environment variable to `1`:
 
-```sh
+```shell
 export STAC_DEFAULT_SUMMARIES=1
 ```
 
 #### Settable Router Prefix
 
-To set a custom router prefix, set the `ROUTER_PREFIX` environment variable. 
+To set a custom router prefix, set the `ROUTER_PREFIX` environment variable.
 
 For example, the following access the same route:
 
 With no router prefix set:
 
-```
+```http request
 GET /collections
 ```
 
 With a custom router prefix set to `/my-prefix`:
 
-```
+```http request
 GET /my-prefix/collections
 ```
 
@@ -102,19 +102,19 @@ To set a custom path for the OpenAPI routes set the following environment variab
 Ensure that the pre-commit checks are installed so that you make sure that your code changes conform to
 the expected style for this project.
 
-```
-pip install pre-commit
-pre-commit install
+```shell
+make install-dev
 ```
 
 ## Releasing
 
 Before making a new release:
 
-```
-pip install bump2version
-bump2version <part>
+```shell
+make install-dev
+make version  # display current version
+make VERSION=<MAJOR.MINOR.PATCH> bump [dry]
 ```
 
-Where `<part>` is one of `major`, `minor`, `patch` to determine which version number is updated.
+You can also invoke `bump-my-version` directly with its relevant options.
 This project uses [semantic versioning](https://semver.org/).
