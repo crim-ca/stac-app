@@ -9,7 +9,6 @@ LABEL version="2.0.1"
 COPY LICENSE ./
 COPY ./pyproject.toml pyproject.toml
 
-RUN apt update --no-install-recommends && apt-get install -y git  # FIXME: remove once patch released
 RUN pip install . && rm pyproject.toml
 
 COPY ./src/ /app
