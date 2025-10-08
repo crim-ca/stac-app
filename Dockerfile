@@ -1,4 +1,4 @@
-FROM python:3.13.5-slim
+FROM python:3.14.0-slim
 LABEL description.short="STAC Populator"
 LABEL description.long="CRIM implementation of FastAPI application for SpatioTemporal Asset Catalogs (STAC) for bird-house platform."
 LABEL maintainer="Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
