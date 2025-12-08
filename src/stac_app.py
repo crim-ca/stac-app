@@ -25,15 +25,18 @@ from stac_fastapi.extensions.core import (
     FieldsExtension,
     FilterExtension,
     ItemCollectionFilterExtension,
-    PaginationExtension,
     QueryExtension,
     SortExtension,
-    TokenPaginationExtension,
     TransactionExtension,
 )
 from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension
 from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
 from stac_fastapi.extensions.core.free_text import FreeTextAdvancedExtension, FreeTextConformanceClasses
+from stac_fastapi.extensions.core.pagination import (
+    OffsetPaginationExtension,
+    PaginationExtension,
+    TokenPaginationExtension
+)
 from stac_fastapi.extensions.core.query import QueryConformanceClasses
 from stac_fastapi.extensions.core.sort import SortConformanceClasses
 from stac_fastapi.pgstac.config import Settings
@@ -126,7 +129,10 @@ collection_base_extensions = [
             FreeTextConformanceClasses.COLLECTIONS_ADVANCED,
         ]
     ),
-    TokenPaginationExtension(),
+    # FIXME: token not supported for collections search (https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)
+    #        if/once resolved, offer the choice using a convenience setting/env-var
+    # TokenPaginationExtension(),
+    OffsetPaginationExtension(),
 ]
 # NOTE:
 #   Using only the 'GET /collections' for search, since 'POST /collections' search
@@ -161,6 +167,9 @@ items_extensions = [
         ]
     ),
     ItemCollectionFilterExtension(client=FiltersClient()),
+    # FIXME: offset not supported for item search (https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)
+    #        if/once resolved, offer the choice using a convenience setting/env-var
+    # OffsetPaginationExtension(),
     TokenPaginationExtension(),
 ]
 items_get_request_model = cast(
@@ -192,7 +201,7 @@ api = StacApi(
         os.getenv("STAC_FASTAPI_DESCRIPTION")
         or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
     ),
-    router=APIRouter(prefix=router_prefix),
+    router=APIRouter(prefix=router_prefix_str),
 )
 app = api.app
 
