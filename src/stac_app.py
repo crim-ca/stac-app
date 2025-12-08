@@ -35,7 +35,7 @@ from stac_fastapi.extensions.core.free_text import FreeTextAdvancedExtension, Fr
 from stac_fastapi.extensions.core.pagination import (
     OffsetPaginationExtension,
     PaginationExtension,
-    TokenPaginationExtension
+    TokenPaginationExtension,
 )
 from stac_fastapi.extensions.core.query import QueryConformanceClasses
 from stac_fastapi.extensions.core.sort import SortConformanceClasses
