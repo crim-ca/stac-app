@@ -7,7 +7,7 @@ includes = ["src"]
 
 [project]
 name = "stac-app"
-version = "2.0.2"
+version = "2.1.0"
 description = "CRIM implementation of FastAPI application for SpatioTemporal Asset Catalogs (STAC) for bird-house platform."
 authors = [
   { name = "Francis Charette-Migneault", email = "francis.charette-migneault@crim.ca" },
@@ -92,7 +92,7 @@ convention = "numpy"
 "test/**.py" = ["D", "ANN"]
 
 [tool.bumpversion]
-current_version = "2.0.2"
+current_version = "2.1.0"
 commit = true
 commit_args = "--no-verify"
 tag = true

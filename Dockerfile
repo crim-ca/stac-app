@@ -3,7 +3,7 @@ LABEL description.short="STAC Populator"
 LABEL description.long="CRIM implementation of FastAPI application for SpatioTemporal Asset Catalogs (STAC) for bird-house platform."
 LABEL maintainer="Francis Charette-Migneault <francis.charette-migneault@crim.ca>"
 LABEL vendor="CRIM"
-LABEL version="2.0.2"
+LABEL version="2.1.0"
 
 # see .dockerignore file for which files are included
 COPY LICENSE ./

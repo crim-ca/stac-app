@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+<!-- insert list items of new changes here -->
+
+[2.1.0](https://github.com/crim-ca/stac-app/tree/2.1.0) (2025-12-08)
+------------------------------------------------------------------------------------------------------------------
+
 - Fix `rel: next` links using `offset` for query paramters instead of `token` in `/collections` search.
   The links will keep using `offset`, but the configuration is aligned with it (rather then `token`) due
   to limited support is `stac-fastapi-pgstac`, in order to make paging behave correctly when listing collections
