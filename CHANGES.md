@@ -3,12 +3,13 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+- Fix reporting of the API's version in OpenAPI specification response using the package's version.
 - Update docker with Python 3.13.11 (security vulnerability fixes).
 
 [2.1.0](https://github.com/crim-ca/stac-app/tree/2.1.0) (2025-12-08)
 ------------------------------------------------------------------------------------------------------------------
 
-- Fix `rel: next` links using `offset` for query paramters instead of `token` in `/collections` search.
+- Fix `rel: next` links using `offset` for query parameters instead of `token` in `/collections` search.
   The links will keep using `offset`, but the configuration is aligned with it (rather then `token`) due
   to limited support is `stac-fastapi-pgstac`, in order to make paging behave correctly when listing collections
   (relates to [stac-utils/stac-fastapi-pgstac#334](https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)).

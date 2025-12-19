@@ -119,6 +119,11 @@ search = "LABEL version=\"{current_version}\""
 replace = "LABEL version=\"{new_version}\""
 
 [[tool.bumpversion.files]]
+filename = "src/stac_app.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
+
+[[tool.bumpversion.files]]
 filename = "CHANGES.md"
 search = """
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)

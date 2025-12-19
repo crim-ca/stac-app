@@ -54,6 +54,9 @@ settings = Settings(validate_extensions=True)
 settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
+# auto-updated by bump version
+__version__ = "2.1.0"
+
 
 class FreeTextCombinedExtensionPostRequest(BaseModel):
     """Free-text Extension POST request model allowing for either Basic or Advanced formats."""
@@ -201,6 +204,7 @@ api = StacApi(
         os.getenv("STAC_FASTAPI_DESCRIPTION")
         or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
     ),
+    api_version=__version__,
     router=APIRouter(prefix=router_prefix_str),
 )
 app = api.app
