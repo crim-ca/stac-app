@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+<!-- insert list items of new changes here -->
+
+[2.2.0](https://github.com/crim-ca/stac-app/tree/2.2.0) (2025-12-18)
+------------------------------------------------------------------------------------------------------------------
+
 - Fix reporting of the API's version in OpenAPI specification response using the package's version.
 - Update docker with Python 3.13.11 (security vulnerability fixes).
 

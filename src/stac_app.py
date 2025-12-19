@@ -55,7 +55,7 @@ settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
 # auto-updated by bump version
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 
 
 class FreeTextCombinedExtensionPostRequest(BaseModel):
