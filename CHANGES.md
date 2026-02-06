@@ -3,7 +3,10 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
-<!-- insert list items of new changes here -->
+- Add more adequate defaults for `STAC_FASTAPI_VERSION` and `STAC_FASTAPI_LANDING_ID` to represent this implementation
+  of STAC API rather than the reference `stac-fastapi` defaults. Variables are aligned with the same names as the 
+  [stac-fastapi settings](https://stac-utils.github.io/stac-fastapi/tips-and-tricks/#set-api-title-description-and-version)
+  to make integration intuitive.
 
 [2.2.0](https://github.com/crim-ca/stac-app/tree/2.2.0) (2025-12-18)
 ------------------------------------------------------------------------------------------------------------------

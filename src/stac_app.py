@@ -57,6 +57,24 @@ settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 # auto-updated by bump version
 __version__ = "2.2.0"
 
+# server identification details on landing page
+settings.stac_fastapi_version = (
+    os.getenv("STAC_FASTAPI_VERSION") or
+    __version__
+)
+settings.stac_fastapi_landing_id = (
+    os.getenv("STAC_FASTAPI_LANDING_ID") or
+    "crim-stac-app"
+)
+settings.stac_fastapi_title = (
+    os.getenv("STAC_FASTAPI_TITLE") or
+    "Data Analytics for Canadian Climate Services STAC API"
+)
+settings.stac_fastapi_description = (
+    os.getenv("STAC_FASTAPI_DESCRIPTION") or
+    "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
+)
+
 
 class FreeTextCombinedExtensionPostRequest(BaseModel):
     """Free-text Extension POST request model allowing for either Basic or Advanced formats."""
@@ -199,12 +217,6 @@ api = StacApi(
     collections_get_request_model=collections_get_request_model,
     items_get_request_model=items_get_request_model,
     response_class=ORJSONResponse,
-    title=(os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"),
-    description=(
-        os.getenv("STAC_FASTAPI_DESCRIPTION")
-        or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
-    ),
-    api_version=__version__,
     router=APIRouter(prefix=router_prefix_str),
 )
 app = api.app
