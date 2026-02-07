@@ -7,6 +7,9 @@
   of STAC API rather than the reference `stac-fastapi` defaults. Variables are aligned with the same names as the 
   [stac-fastapi settings](https://stac-utils.github.io/stac-fastapi/tips-and-tricks/#set-api-title-description-and-version)
   to make integration intuitive.
+- Pin `starlette<0.51.0` to avoid compatibility issue in `CORSMiddleware` signature
+  (relates to [stac-utils/stac-fastapi#879](https://github.com/stac-utils/stac-fastapi/pull/879) 
+  and [Kludex/starlette#3065](https://github.com/Kludex/starlette/pull/3065)).
 
 [2.2.0](https://github.com/crim-ca/stac-app/tree/2.2.0) (2025-12-18)
 ------------------------------------------------------------------------------------------------------------------
