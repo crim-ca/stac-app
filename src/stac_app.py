@@ -58,21 +58,12 @@ settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 __version__ = "2.2.0"
 
 # server identification details on landing page
-settings.stac_fastapi_version = (
-    os.getenv("STAC_FASTAPI_VERSION") or
-    __version__
-)
-settings.stac_fastapi_landing_id = (
-    os.getenv("STAC_FASTAPI_LANDING_ID") or
-    "crim-stac-app"
-)
-settings.stac_fastapi_title = (
-    os.getenv("STAC_FASTAPI_TITLE") or
-    "Data Analytics for Canadian Climate Services STAC API"
-)
+settings.stac_fastapi_version = os.getenv("STAC_FASTAPI_VERSION") or __version__
+settings.stac_fastapi_landing_id = os.getenv("STAC_FASTAPI_LANDING_ID") or "crim-stac-app"
+settings.stac_fastapi_title = os.getenv("STAC_FASTAPI_TITLE") or "Data Analytics for Canadian Climate Services STAC API"
 settings.stac_fastapi_description = (
-    os.getenv("STAC_FASTAPI_DESCRIPTION") or
-    "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
+    os.getenv("STAC_FASTAPI_DESCRIPTION")
+    or "Searchable spatiotemporal metadata describing climate and Earth observation datasets."
 )
 
 
