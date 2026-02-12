@@ -1,6 +1,6 @@
 # STAC API implementation for [Birdhouse](https://github.com/bird-house/birdhouse-deploy/tree/master/birdhouse)
 
-[![Latest Version](https://img.shields.io/badge/latest%20version-2.2.0-blue?logo=github)](https://github.com/crim-ca/stac-app/tree/2.2.0)
+[![Latest Version](https://img.shields.io/badge/latest%20version-2.3.0-blue?logo=github)](https://github.com/crim-ca/stac-app/tree/2.3.0)
 [![License](https://img.shields.io/github/license/crim-ca/stac-app)](https://github.com/crim-ca/stac-app/blob/main/LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-crim--ca%2Fstac--app-blue?logo=docker)](https://github.com/crim-ca/stac-app/pkgs/container/stac-app)
 
