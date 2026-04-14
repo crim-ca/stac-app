@@ -32,11 +32,7 @@ from stac_fastapi.extensions.core import (
 from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension
 from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
 from stac_fastapi.extensions.core.free_text import FreeTextAdvancedExtension, FreeTextConformanceClasses
-from stac_fastapi.extensions.core.pagination import (
-    OffsetPaginationExtension,
-    PaginationExtension,
-    TokenPaginationExtension,
-)
+from stac_fastapi.extensions.core.pagination import OffsetPaginationExtension, TokenPaginationExtension
 from stac_fastapi.extensions.core.query import QueryConformanceClasses
 from stac_fastapi.extensions.core.sort import SortConformanceClasses
 from stac_fastapi.pgstac.config import Settings
@@ -109,7 +105,10 @@ search_extensions = [
         ]
     ),
     FilterExtension(client=FiltersClient()),
-    PaginationExtension(),
+    # when top-level search, it corresponds to Items (directly or recursively),
+    # so we must employ the same paging method as the items endpoint below
+    # (see also https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)
+    TokenPaginationExtension(),
 ]
 search_get_request_model = cast(
     Union[Type[APIRequest], Type[BaseSearchGetRequest]], create_get_request_model(search_extensions)
