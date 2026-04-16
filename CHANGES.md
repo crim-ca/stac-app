@@ -3,17 +3,19 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
-<!-- insert list items of new changes here -->
+- Fix STAC Item `/search` paging using `token`-based `next` links
+  (relates to [stac-utils/stac-fastapi-pgstac#334](https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)
+  and [stac-utils/stac-fastapi-pgstac#375](https://github.com/stac-utils/stac-fastapi-pgstac/pull/375)).
 
 [2.3.0](https://github.com/crim-ca/stac-app/tree/2.3.0) (2026-02-11)
 ------------------------------------------------------------------------------------------------------------------
 
 - Add more adequate defaults for `STAC_FASTAPI_VERSION` and `STAC_FASTAPI_LANDING_ID` to represent this implementation
-  of STAC API rather than the reference `stac-fastapi` defaults. Variables are aligned with the same names as the 
+  of STAC API rather than the reference `stac-fastapi` defaults. Variables are aligned with the same names as the
   [stac-fastapi settings](https://stac-utils.github.io/stac-fastapi/tips-and-tricks/#set-api-title-description-and-version)
   to make integration intuitive.
 - Pin `stac-fastapi.api==6.2.1` to integrate compatibility fix of `CORSMiddleware` signature with `starlette>=0.51.0`
-  (relates to [stac-utils/stac-fastapi#879](https://github.com/stac-utils/stac-fastapi/pull/879), 
+  (relates to [stac-utils/stac-fastapi#879](https://github.com/stac-utils/stac-fastapi/pull/879),
   [stac-utils/stac-fastapi#882](https://github.com/stac-utils/stac-fastapi/pull/882)
   and [Kludex/starlette#3065](https://github.com/Kludex/starlette/pull/3065)).
 
@@ -54,14 +56,14 @@
 
 # Changed
 
-- Add `CollectionSearchExtension` base class to support the `pgstac` `collection_search` operator 
+- Add `CollectionSearchExtension` base class to support the `pgstac` `collection_search` operator
   for `GET /collections` request.
 
   _**NOTE**_: <br>
   Because this extension relies on a specific SQL function `collection_search` and its adjusted feature
   for parameter `q`, [`pgstac>=0.9.2`](https://stac-utils.github.io/pgstac/release-notes/#v092) is required. This
   means the underlying PostgreSQL version **MUST** be migrated to 17.
-  
+
   _**NOTE**_: <br>
   The `CollectionSearchPostExtension` is *purposely* omitted as it would conflict with the `Transaction` extension
   that both uses the same `POST /collections` endpoint for search and collection creation respectively.
@@ -108,7 +110,7 @@
 
 - Update to latest available versions `stac-fastapi.api==5.2.0`, `stac-fastapi.pgstac==5.0.2` and `uvicorn==0.34.2`.
   This mostly includes security fixes, minor performance improvements, and many additional STAC-API extension features
-  that are not yet enabled, but planned in a following release. 
+  that are not yet enabled, but planned in a following release.
 
 # Fixed
 
@@ -124,7 +126,7 @@
 - Fix bug where arrays of datetime values were not handled correctly
 
   Arrays of datetime strings were not being considered as values that can have a minimum and
-  maximum (ie. a range) so were summarized as deeply nested `anyOf` schemas. This is a very 
+  maximum (ie. a range) so were summarized as deeply nested `anyOf` schemas. This is a very
   inefficient way to store a schema representing these values.
 
 [1.0.0](https://github.com/crim-ca/stac-app/tree/1.0.0)
@@ -134,7 +136,7 @@
 
 - Make queryables and summaries automatically updatable
 
-  Previously this app implemented a custom /queryables endpoint that crawled the database to display information about the 
+  Previously this app implemented a custom /queryables endpoint that crawled the database to display information about the
   items stored in the database. This method has some limitations:
 
   It only worked for individual collections, not all queryables across all collections
@@ -147,8 +149,8 @@
 - Update README.md to document the new functionality described above.
 
 - Add `PATCH /queryables` endpoint to update queryables to reflect the current items stored in the database.
-  This endpoint takes the optional parameter `minimal`. If the minimal parameter is True, then only "minimal" 
-  queryables will set. Minimal queryables are those whose values are scalar JSON types. Collection JSON types 
+  This endpoint takes the optional parameter `minimal`. If the minimal parameter is True, then only "minimal"
+  queryables will set. Minimal queryables are those whose values are scalar JSON types. Collection JSON types
   (objects and arrays) will be omitted.
 
 - Add `PATCH /summaries` endpoint to update collection summaries to reflect the current items associated with
