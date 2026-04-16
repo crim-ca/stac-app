@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+<!-- insert list items of new changes here -->
+
+[2.3.1](https://github.com/crim-ca/stac-app/tree/2.3.1) (2026-04-16)
+------------------------------------------------------------------------------------------------------------------
+
 - Fix STAC Item `/search` paging using `token`-based `next` links
   (relates to [stac-utils/stac-fastapi-pgstac#334](https://github.com/stac-utils/stac-fastapi-pgstac/issues/334)
   and [stac-utils/stac-fastapi-pgstac#375](https://github.com/stac-utils/stac-fastapi-pgstac/pull/375)).

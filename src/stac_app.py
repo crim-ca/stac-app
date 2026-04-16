@@ -51,7 +51,7 @@ settings.openapi_url = os.environ.get("OPENAPI_URL", "/api")
 settings.docs_url = os.environ.get("DOCS_URL", "/api.html")
 
 # auto-updated by bump version
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 
 # server identification details on landing page
 settings.stac_fastapi_version = os.getenv("STAC_FASTAPI_VERSION") or __version__
