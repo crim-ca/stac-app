@@ -3,6 +3,11 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
+<!-- insert list items of new changes here -->
+
+[2.4.0](https://github.com/crim-ca/stac-app/tree/2.4.0) (2026-07-06)
+------------------------------------------------------------------------------------------------------------------
+
 - Update Docker with Python 3.13.14 for security fixes.
 - Update `stac-fastapi.api` to 6.3.2 and `stac-fastapi.pgstac` to 6.3.1 with extension move away from `core` module.
 - Update `Makefile` to provide similar operations employed within the CI to setup and test the API.
