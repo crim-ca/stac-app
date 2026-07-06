@@ -32,17 +32,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6.2.0
         with:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build Docker Image
         id: push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7.3.0
         with:
           context: .
           push: false
@@ -50,28 +50,9 @@ jobs:
 
       - name: Run Test
         run: |
-          docker run --rm -d \
-            --network ${{ job.container.network }} \
-            -p 8000:8000 \
-            -e PGPASSWORD=postgres \
-            -e PGHOST=postgres \
-            -e PGDATABASE=postgres \
-            -e PGUSER=postgres \
-            -e POSTGRES_DBNAME=postgis \
-            -e POSTGRES_HOST_READER=postgres \
-            -e POSTGRES_HOST_WRITER=postgres \
-            -e POSTGRES_PORT=5432 \
-            -e ROUTER_PREFIX=/stac \
-            --name stac-app \
-            ${{ steps.meta.outputs.tags }}
+          make docker-run \
+            DOCKER_RUN_IMAGE="${{ steps.meta.outputs.tags }}" \
+            DOCKER_RUN_NETWORK="${{ job.container.network }}"
           docker ps
-          docker run --rm \
-            --network ${{ job.container.network }} \
-            curlimages/curl:8.7.1 \
-            curl \
-              --retry 3 \
-              --retry-delay 5 \
-              --retry-max-time 30 \
-              --retry-connrefused \
-              "http://stac-app:8000/stac/" \
-              | grep '"type":"Catalog","id":"stac-fastapi"'
+          make docker-test \
+            DOCKER_TEST_NETWORK="${{ job.container.network }}"

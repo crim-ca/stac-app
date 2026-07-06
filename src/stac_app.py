@@ -20,7 +20,7 @@ from stac_fastapi.api.models import (
     create_post_request_model,
 )
 from stac_fastapi.api.version import __version__ as stac_fastapi_version
-from stac_fastapi.extensions.core import (
+from stac_fastapi.extensions import (
     CollectionSearchFilterExtension,
     FieldsExtension,
     FilterExtension,
@@ -29,12 +29,12 @@ from stac_fastapi.extensions.core import (
     SortExtension,
     TransactionExtension,
 )
-from stac_fastapi.extensions.core.collection_search import CollectionSearchExtension
-from stac_fastapi.extensions.core.fields import FieldsConformanceClasses
-from stac_fastapi.extensions.core.free_text import FreeTextAdvancedExtension, FreeTextConformanceClasses
-from stac_fastapi.extensions.core.pagination import OffsetPaginationExtension, TokenPaginationExtension
-from stac_fastapi.extensions.core.query import QueryConformanceClasses
-from stac_fastapi.extensions.core.sort import SortConformanceClasses
+from stac_fastapi.extensions.collection_search import CollectionSearchExtension
+from stac_fastapi.extensions.fields import FieldsConformanceClasses
+from stac_fastapi.extensions.free_text import FreeTextAdvancedExtension, FreeTextConformanceClasses
+from stac_fastapi.extensions.pagination import OffsetPaginationExtension, TokenPaginationExtension
+from stac_fastapi.extensions.query import QueryConformanceClasses
+from stac_fastapi.extensions.sort import SortConformanceClasses
 from stac_fastapi.pgstac.config import Settings
 from stac_fastapi.pgstac.core import CoreCrudClient
 from stac_fastapi.pgstac.db import close_db_connection, connect_to_db
