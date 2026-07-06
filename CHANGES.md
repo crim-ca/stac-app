@@ -3,7 +3,7 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
-<!-- insert list items of new changes here -->
+- Update Docker with Python 3.13.14 for security fixes.
 
 [2.3.1](https://github.com/crim-ca/stac-app/tree/2.3.1) (2026-04-16)
 ------------------------------------------------------------------------------------------------------------------
