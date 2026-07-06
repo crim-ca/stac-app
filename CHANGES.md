@@ -4,6 +4,7 @@
 ------------------------------------------------------------------------------------------------------------------
 
 - Update Docker with Python 3.13.14 for security fixes.
+- Update `stac-fastapi.api` to 6.3.2 and `stac-fastapi.pgstac` to 6.3.1 with extension move away from `core` module.
 
 [2.3.1](https://github.com/crim-ca/stac-app/tree/2.3.1) (2026-04-16)
 ------------------------------------------------------------------------------------------------------------------
