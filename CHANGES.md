@@ -3,7 +3,7 @@
 [Unreleased](https://github.com/crim-ca/stac-app/tree/main) (latest)
 ------------------------------------------------------------------------------------------------------------------
 
-<!-- insert list items of new changes here -->
+- Update `brotli>=1.2.1` for CVE-2026-111497 security fix.
 
 [2.4.0](https://github.com/crim-ca/stac-app/tree/2.4.0) (2026-07-06)
 ------------------------------------------------------------------------------------------------------------------
