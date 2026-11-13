@@ -73,6 +73,14 @@ install:
 install-dev:
 	pip install "$(APP_ROOT)[dev]"
 
+.NOTPARALLEL: test
+.PHONY: test
+test: install-dev test-only
+
+.PHONY: test-only
+test-only:
+	PYTHONPATH="$(APP_ROOT)/src" python -m pytest "$(APP_ROOT)/tests"
+
 format:
 	pre-commit run --all-files
 

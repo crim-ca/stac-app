@@ -4,9 +4,10 @@
 import logging
 import os
 import time
-from typing import Annotated, Optional, Type, Union, cast
+from typing import Annotated, Optional, Type, TypeVar, Union, cast
 
 import asyncpg
+import orjson
 from buildpg import render
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import ORJSONResponse
@@ -42,6 +43,7 @@ from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
+from stac_fastapi.types.stac import Collection, Collections, ItemCollection
 
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
@@ -198,10 +200,108 @@ router_prefix_str = router_prefix.rstrip("/") if router_prefix else ""
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+_STAC_CONTEXT_FIELD_ORDER = {"stac_version": 0, "stac_extensions": 1, "conformsTo": 2}
+ResponseT = TypeVar("ResponseT")
+
+
+def _stac_field_order(field: str) -> tuple[int, int | str, str]:
+    if field in _STAC_CONTEXT_FIELD_ORDER:
+        return (0, _STAC_CONTEXT_FIELD_ORDER[field], "")
+    if field == "type":
+        return (1, "", "")
+    if ":" in field:
+        namespace = field.split(":", maxsplit=1)[0]
+        return (2, namespace.casefold(), field.casefold())
+    return (1, field.casefold(), "")
+
+
+def _stac_item_field_order(field: str) -> tuple[int, int | str, str]:
+    if field in _STAC_CONTEXT_FIELD_ORDER:
+        return (0, _STAC_CONTEXT_FIELD_ORDER[field], "")
+    if field == "id":
+        return (1, 0, "")
+    if field == "collection":
+        return (2, 0, "")
+    if field == "type":
+        return (4, 0, "")
+    if field in {"bbox", "geometry"}:
+        return (5, {"bbox": 0, "geometry": 1}[field], "")
+    if field in {"properties", "assets", "links"}:
+        return (6, {"properties": 0, "assets": 1, "links": 2}[field], "")
+    if ":" in field:
+        namespace = field.split(":", maxsplit=1)[0]
+        return (7, namespace.casefold(), field.casefold())
+    return (3, field.casefold(), "")
+
+
+def _stac_collection_field_order(field: str) -> tuple[int, int | str, str]:
+    if field in _STAC_CONTEXT_FIELD_ORDER:
+        return (0, _STAC_CONTEXT_FIELD_ORDER[field], "")
+    if field == "id":
+        return (1, 0, "")
+    if field == "type":
+        return (2, 0, "")
+    if field in {"title", "description", "summaries"}:
+        return (3, {"title": 0, "description": 1, "summaries": 2}[field], "")
+    if field in {"license", "keywords", "providers"}:
+        return (4, {"license": 0, "keywords": 1, "providers": 2}[field], "")
+    if field == "extent":
+        return (5, 0, "")
+    if field == "assets":
+        return (6, 0, "")
+    if field == "links":
+        return (7, 0, "")
+    if ":" in field:
+        namespace = field.split(":", maxsplit=1)[0]
+        return (8, namespace.casefold(), field.casefold())
+    return (4, field.casefold(), "")
+
+
+def _order_stac_response(value: ResponseT) -> ResponseT:
+    """Order STAC fields with core fields first and extension fields grouped by namespace."""
+    if isinstance(value, dict):
+        if value.get("type") == "Feature":
+            field_order = _stac_item_field_order
+        elif value.get("type") == "Collection":
+            field_order = _stac_collection_field_order
+        else:
+            field_order = _stac_field_order
+        ordered = {field: _order_stac_response(value[field]) for field in sorted(value, key=field_order)}
+        return cast(ResponseT, ordered)
+    if isinstance(value, list):
+        return cast(ResponseT, [_order_stac_response(item) for item in value])
+    if isinstance(value, ORJSONResponse) and "json" in value.media_type:
+        headers = dict(value.headers)
+        headers.pop("content-length", None)
+        response = type(value)(
+            _order_stac_response(orjson.loads(value.body)),
+            status_code=value.status_code,
+            headers=headers,
+            background=value.background,
+        )
+        return cast(ResponseT, response)
+    return value
+
+
+class OrderedCoreCrudClient(CoreCrudClient):
+    """Core client that orders STAC object fields before serialization."""
+
+    async def _search_base(self, search_request: PgstacSearch, request: Request) -> ItemCollection:
+        return _order_stac_response(await super()._search_base(search_request, request))
+
+    async def get_collection(self, collection_id: str, request: Request) -> Collection:
+        """Return a Collection with its core fields ordered before extension fields."""
+        return _order_stac_response(await super().get_collection(collection_id, request))
+
+    async def all_collections(self, request: Request, **kwargs: object) -> Collections:
+        """Return Collections with core fields ordered before extension fields."""
+        return _order_stac_response(await super().all_collections(request, **kwargs))
+
+
 api = StacApi(
     settings=settings,
     extensions=app_extensions,
-    client=CoreCrudClient(pgstac_search_model=search_post_request_model),
+    client=OrderedCoreCrudClient(pgstac_search_model=search_post_request_model),
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     collections_get_request_model=collections_get_request_model,
