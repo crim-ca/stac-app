@@ -5,7 +5,8 @@
 
 <!-- insert list items of new changes here -->
 
-- Order core STAC fields before namespaced extension fields in Item and Collection responses
+- Order core STAC fields before namespaced extension fields in Catalog, Collection and Item responses,
+  including fields of `links` and `assets` objects
   (fixes [crim-ca/stac-app#108](https://github.com/crim-ca/stac-app/issues/108)).
 
 [2.4.1](https://github.com/crim-ca/stac-app/tree/2.4.1) (2026-10-30)
