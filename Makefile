@@ -61,7 +61,7 @@ docker-test: docker-network
 			--retry-max-time 30 \
 			--retry-connrefused \
 			"http://$(APP_NAME):8000/stac/" \
-			| grep '"type":"Catalog","id":"stac-fastapi"'
+			| grep '"id":"stac-fastapi","type":"Catalog"'
 
 docker-stop:
 	docker stop $(DOCKER_DB_NAME) || true
