@@ -61,6 +61,7 @@ license = "https://github.com/crim-ca/stac-app/blob/main/LICENSE"
 dev = [
     "bump-my-version~=1.2",
     "pre-commit~=4.2",
+    "pytest~=9.0",
 ]
 
 [tool.ruff]
@@ -91,7 +92,7 @@ ignore = ["D100", "D104", "D417", "ANN002", "ANN003"]
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-"test/**.py" = ["D", "ANN"]
+"tests/**.py" = ["D", "ANN"]
 
 [tool.bumpversion]
 current_version = "2.4.1"

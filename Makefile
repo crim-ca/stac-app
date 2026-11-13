@@ -61,7 +61,7 @@ docker-test: docker-network
 			--retry-max-time 30 \
 			--retry-connrefused \
 			"http://$(APP_NAME):8000/stac/" \
-			| grep '"type":"Catalog","id":"stac-fastapi"'
+			| grep '"id":"stac-fastapi","type":"Catalog"'
 
 docker-stop:
 	docker stop $(DOCKER_DB_NAME) || true
@@ -72,6 +72,14 @@ install:
 
 install-dev:
 	pip install "$(APP_ROOT)[dev]"
+
+.NOTPARALLEL: test
+.PHONY: test
+test: install-dev test-only
+
+.PHONY: test-only
+test-only:
+	PYTHONPATH="$(APP_ROOT)/src" python -m pytest "$(APP_ROOT)/tests"
 
 format:
 	pre-commit run --all-files

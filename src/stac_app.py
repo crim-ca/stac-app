@@ -42,6 +42,9 @@ from stac_fastapi.pgstac.extensions.filter import FiltersClient
 from stac_fastapi.pgstac.transactions import TransactionsClient
 from stac_fastapi.pgstac.types.search import PgstacSearch
 from stac_fastapi.types.search import APIRequest, BaseSearchGetRequest, BaseSearchPostRequest
+from stac_fastapi.types.stac import Collection, Collections, ItemCollection, LandingPage
+
+from ordering import _order_stac_response
 
 # hijack uvicorn's logger (otherwise log messages won't be visible)
 logger = logging.getLogger("uvicorn.error")
@@ -198,10 +201,30 @@ router_prefix_str = router_prefix.rstrip("/") if router_prefix else ""
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
+class OrderedCoreCrudClient(CoreCrudClient):
+    """Core client that orders STAC object fields before serialization."""
+
+    async def landing_page(self, **kwargs: object) -> LandingPage:
+        """Return the landing page Catalog with its core fields ordered before extension fields."""
+        return _order_stac_response(await super().landing_page(**kwargs))
+
+    async def _search_base(self, search_request: PgstacSearch, request: Request) -> ItemCollection:
+        return _order_stac_response(await super()._search_base(search_request, request))
+
+    async def get_collection(self, collection_id: str, request: Request) -> Collection:
+        """Return a Collection with its core fields ordered before extension fields."""
+        return _order_stac_response(await super().get_collection(collection_id, request))
+
+    async def all_collections(self, request: Request, **kwargs: object) -> Collections:
+        """Return Collections with core fields ordered before extension fields."""
+        return _order_stac_response(await super().all_collections(request, **kwargs))
+
+
 api = StacApi(
     settings=settings,
     extensions=app_extensions,
-    client=CoreCrudClient(pgstac_search_model=search_post_request_model),
+    client=OrderedCoreCrudClient(pgstac_search_model=search_post_request_model),
     search_get_request_model=search_get_request_model,
     search_post_request_model=search_post_request_model,
     collections_get_request_model=collections_get_request_model,
